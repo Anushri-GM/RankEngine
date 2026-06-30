@@ -1,0 +1,15 @@
+{
+  "name": "reci-ai",
+  "version": "1.0.0",
+  "description": "RECI (Redrob Explainable Candidate Intelligence) - AI recruitment platform foundation",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix frontend && pip install -r requirements.txt",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "cd backend && uvicorn app.main:app --reload --port 8000",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

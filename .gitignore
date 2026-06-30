@@ -1,0 +1,5 @@
+# Ignored zip and unzipped challenge dataset files
+*India_runs_data_and_ai_challenge.zip
+extracted_data/
+__MACOSX/
+.DS_Store

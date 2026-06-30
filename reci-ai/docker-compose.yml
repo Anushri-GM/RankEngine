@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      target: backend
+    container_name: reci-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
+      - ./cache:/app/cache
+      - ./outputs:/app/outputs
+    environment:
+      - PORT=8000
+      - ENV=development
+      - MODEL_CACHE=/app/cache
+      - OUTPUT_PATH=/app/outputs
+    restart: always
+
+  frontend:
+    build:
+      context: .
+      target: frontend
+    container_name: reci-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: always
