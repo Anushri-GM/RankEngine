@@ -8,6 +8,7 @@ from app.understanding.validation_engine import ValidationEngine
 from app.understanding.normalization_engine import NormalizationEngine
 from app.understanding.skill_taxonomy import taxonomy
 from app.understanding.loader import Loader
+from app.understanding.parser_metadata import ParserMetadataEngine
 
 def create_mock_docx() -> bytes:
     """
@@ -126,3 +127,29 @@ def test_taxonomy():
     assert taxonomy.get_canonical("k8s") == "Kubernetes"
     assert taxonomy.get_category("PostgreSQL") == "Database"
     assert taxonomy.get_category("React") == "Frontend"
+
+
+def test_parser_metadata_generation(tmp_path):
+    candidates = Loader.get_sample_candidates()
+    processed_candidates = [CandidateUnderstandingEngine.process_candidate(c) for c in candidates]
+    validation_report = ValidationEngine.validate_candidate_dataset(candidates)
+    behavior_profiles = [BehaviorUnderstanding.generate_profile(candidate, validation_report.status) for candidate in processed_candidates]
+
+    manifest, parser_report, skill_taxonomy, role_taxonomy, dataset_statistics = ParserMetadataEngine.generate_artifacts(
+        candidates=candidates,
+        processed_candidates=processed_candidates,
+        behavior_profiles=behavior_profiles,
+        validation_report=validation_report,
+        dataset_path=tmp_path / "sample_candidates.json",
+        output_dir=tmp_path / "outputs",
+    )
+
+    assert manifest["candidate_count"] == len(candidates)
+    assert manifest["dataset_name"] == "sample_candidates"
+    assert manifest["valid_candidates"] >= 1
+    assert parser_report["average_skills"] > 0
+    assert parser_report["average_experience"] > 0
+    assert parser_report["average_projects"] > 0
+    assert skill_taxonomy[0]["canonical_name"] in {"Python", "JavaScript", "React"}
+    assert role_taxonomy[0]["role_category"]
+    assert dataset_statistics["candidate_count"] == len(candidates)

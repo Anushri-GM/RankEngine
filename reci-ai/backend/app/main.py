@@ -63,6 +63,8 @@ async def v1_health_check():
 # Import understanding endpoints
 from app.api.v1.endpoints.understanding import router as understanding_router
 api_router.include_router(understanding_router, prefix="/understanding", tags=["Understanding"])
+from app.api.v1.endpoints.decision import router as decision_router
+api_router.include_router(decision_router, prefix="/decision", tags=["Decision"])
 
 # Register v1 router to the app
 app.include_router(api_router, prefix=settings.API_V1_STR)
