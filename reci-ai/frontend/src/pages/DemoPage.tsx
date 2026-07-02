@@ -44,7 +44,11 @@ export const DemoPage: React.FC = () => {
               </p>
               <p className="text-xs mt-1 text-red-700">{error}</p>
               <p className="text-xs mt-2 text-slate-500 font-medium">
-                Tip: Run <code className="bg-slate-100 px-1.5 py-0.5 rounded">start_backend.bat</code> in the repository root to start the backend server.
+                {window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? (
+                  <>Tip: Run <code className="bg-slate-100 px-1.5 py-0.5 rounded">start_backend.bat</code> in the repository root to start the backend server.</>
+                ) : (
+                  <>Tip: Ensure your deployed backend is running and that the <code className="bg-slate-100 px-1.5 py-0.5 rounded">VITE_API_URL</code> environment variable is set in your Vercel settings pointing to your Render backend URL.</>
+                )}
               </p>
             </div>
           )}

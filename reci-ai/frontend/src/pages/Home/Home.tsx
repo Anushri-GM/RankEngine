@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useSessions, useCreateSession } from '../../hooks/api/sessions';
+import { useSessions, useCreateSession, useDeleteSession } from '../../hooks/api/sessions';
 import { Button, Card, EmptyState, SkeletonLoader } from '../../components/common';
 import { SessionCard } from '../../components/cards/CandidateCard';
 import { Plus, FileText, BarChart3 } from 'lucide-react';
@@ -10,7 +10,18 @@ export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { data: sessions, isLoading } = useSessions();
   const createSessionMutation = useCreateSession();
+  const deleteSessionMutation = useDeleteSession();
   const [roleTitle, setRoleTitle] = React.useState('');
+
+  const handleDeleteSession = async (sessionId: string) => {
+    if (window.confirm('Are you sure you want to delete this hiring session and all its associated data?')) {
+      try {
+        await deleteSessionMutation.mutateAsync(sessionId);
+      } catch (error) {
+        console.error('Failed to delete session:', error);
+      }
+    }
+  };
 
   const handleCreateSession = async () => {
     if (!roleTitle.trim()) return;
@@ -103,7 +114,11 @@ export const HomePage: React.FC = () => {
                   {createSessionMutation.error instanceof Error ? createSessionMutation.error.message : 'Please try again.'}
                 </p>
                 <p className="text-xs mt-1 text-slate-500 font-medium">
-                  Tip: Make sure the backend is running by executing <code className="bg-slate-100 px-1 py-0.5 rounded">start_backend.bat</code>.
+                  {window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? (
+                    <>Tip: Make sure the backend is running by executing <code className="bg-slate-100 px-1 py-0.5 rounded">start_backend.bat</code>.</>
+                  ) : (
+                    <>Tip: Ensure the deployed backend service is running and that the <code className="bg-slate-100 px-1.5 py-0.5 rounded">VITE_API_URL</code> environment variable is set in your Vercel settings.</>
+                  )}
                 </p>
               </div>
             )}
@@ -168,6 +183,7 @@ export const HomePage: React.FC = () => {
                       }
                     }}
                     onExport={() => navigate(`/insights/${session.session_id}`)}
+                    onDelete={() => handleDeleteSession(session.session_id)}
                   />
                 </motion.div>
               ))}

@@ -130,12 +130,12 @@ def _auto_init_demo_data() -> None:
 
     cand_intel_path = output_dir / "candidate_intelligence.json"
 
-    # Skip if already processed
+    # Skip if already processed and scored
     if cand_intel_path.exists():
         try:
             with open(cand_intel_path, "r", encoding="utf-8") as fh:
                 existing = json.load(fh)
-            if existing:
+            if existing and any(c.get("scores") for c in existing):
                 app_logger.info("demo_data_already_present", extra={"event": "auto_init", "count": len(existing)})
                 _ensure_demo_session(output_dir)
                 return
@@ -188,6 +188,11 @@ def _auto_init_demo_data() -> None:
             job_intelligence=_get_demo_job_intelligence(),
         )
 
+        # Write demo job intelligence
+        job_intel = _get_demo_job_intelligence()
+        with open(output_dir / "job_intelligence.json", "w", encoding="utf-8") as fh:
+            json.dump(job_intel, fh, indent=2)
+
         enhanced_candidates = []
         for idx, (candidate, profile) in enumerate(zip(processed_candidates, behavior_profiles)):
             enhanced_candidates.append(
@@ -200,6 +205,79 @@ def _auto_init_demo_data() -> None:
                 )
             )
 
+        # Rerank and score candidates for the demo job
+        try:
+            from app.decision_engine.decision_engine import DecisionEngine
+            engine = DecisionEngine()
+            engine.prepare_embeddings_and_index()
+            
+            job_text = " ".join(job_intel.get("required_skills", []) + job_intel.get("preferred_skills", []))
+            top = engine.retrieve_top_candidates(job_text, top_k=50)
+            
+            cand_map = {c["candidate_id"]: c for c in enhanced_candidates}
+            candidates_for_rerank = []
+            for item in top:
+                cid = item.get("candidate_id")
+                c = cand_map.get(cid, {})
+                text = " ".join(c.get("skills", []) + [p.get("name", "") for p in c.get("projects", [])])
+                candidates_for_rerank.append({"candidate_id": cid, "text": text})
+                
+            reranked = engine.rerank_with_cross_encoder(job_text, candidates_for_rerank)
+            scored_results = engine.score_candidates(reranked, job_intel)
+            
+            scored_map = {item["candidate_id"]: item for item in scored_results}
+            for c in enhanced_candidates:
+                cid = c.get("candidate_id")
+                scores_item = scored_map.get(cid)
+                if scores_item:
+                    sm = scores_item.get("skill_match", {})
+                    cm = scores_item.get("career_match", {})
+                    
+                    technical = float(sm.get("overall", 0))
+                    career = float(cm.get("experience_score", 0))
+                    behavior = float(c.get("profile_completeness_score", 85.0) or 85.0)
+                    experience = float(cm.get("experience_score", 0))
+                    domain = float(sm.get("score_req", 0) * 0.8 + 20)
+                    trust = float(c.get("profile_completeness_score", 90.0) or 90.0)
+                    
+                    overall_fit = round((technical * 0.4) + (career * 0.3) + (behavior * 0.1) + (experience * 0.2), 2)
+                    
+                    c["scores"] = {
+                        "overall_fit": overall_fit,
+                        "trust": trust,
+                        "technical": technical,
+                        "career": career,
+                        "behavior": behavior,
+                        "experience": experience,
+                        "domain": domain,
+                    }
+                    c["overall_fit_score"] = overall_fit
+                    c["recruiter_trust_score"] = trust
+                    c["technical_fit"] = technical
+                    c["career_fit"] = career
+                    c["behavior_fit"] = behavior
+                    c["experience_fit"] = experience
+                    c["domain_fit"] = domain
+                    if overall_fit >= 85:
+                        c["recommendation"] = "strong_match"
+                    elif overall_fit >= 70:
+                        c["recommendation"] = "good_match"
+                    else:
+                        c["recommendation"] = "potential_match"
+                else:
+                    c["scores"] = {
+                        "overall_fit": 0.0,
+                        "trust": 0.0,
+                        "technical": 0.0,
+                        "career": 0.0,
+                        "behavior": 0.0,
+                        "experience": 0.0,
+                        "domain": 0.0,
+                    }
+                    c["recommendation"] = "potential_match"
+        except Exception as exc:
+            app_logger.warning("failed_to_score_demo_candidates", extra={"error": str(exc)})
+
         with open(cand_intel_path, "w", encoding="utf-8") as fh:
             json.dump(enhanced_candidates, fh, indent=2)
 
@@ -208,11 +286,6 @@ def _auto_init_demo_data() -> None:
 
         with open(output_dir / "validation_report.json", "w", encoding="utf-8") as fh:
             fh.write(validation_report.model_dump_json(indent=2))
-
-        # Write demo job intelligence
-        job_intel = _get_demo_job_intelligence()
-        with open(output_dir / "job_intelligence.json", "w", encoding="utf-8") as fh:
-            json.dump(job_intel, fh, indent=2)
 
         _ensure_demo_session(output_dir)
 
