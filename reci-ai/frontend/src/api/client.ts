@@ -1,6 +1,16 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+let rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+// Remove trailing slash if present
+if (rawApiUrl.endsWith('/')) {
+  rawApiUrl = rawApiUrl.slice(0, -1);
+}
+
+// Ensure it ends with /api/v1
+export const API_URL = rawApiUrl.endsWith('/api/v1') 
+  ? rawApiUrl 
+  : `${rawApiUrl}/api/v1`;
 
 export const apiClient = axios.create({
   baseURL: API_URL,

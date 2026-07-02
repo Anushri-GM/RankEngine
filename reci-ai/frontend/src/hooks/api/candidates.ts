@@ -1,16 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { apiClient } from '../../api/client';
 import type { CandidateProfile, CandidateDetail, RankingResult, SearchFilters, SearchResult } from '../../types';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const useCandidates = (sessionId: string | undefined) => {
   return useQuery({
     queryKey: ['candidates', sessionId],
     queryFn: async () => {
       if (!sessionId) throw new Error('Session ID is required');
-      const response = await axios.get<{ data: CandidateProfile[] }>(
-        `${API_BASE_URL}/api/v1/candidates/${sessionId}`
+      const response = await apiClient.get<{ data: CandidateProfile[] }>(
+        `/candidates/${sessionId}`
       );
       return response.data.data;
     },
@@ -24,8 +22,8 @@ export const useCandidateDetail = (sessionId: string | undefined, candidateId: s
     queryKey: ['candidate-detail', sessionId, candidateId],
     queryFn: async () => {
       if (!sessionId || !candidateId) throw new Error('Session ID and Candidate ID are required');
-      const response = await axios.get<{ data: CandidateDetail }>(
-        `${API_BASE_URL}/api/v1/candidates/${sessionId}/${candidateId}`
+      const response = await apiClient.get<{ data: CandidateDetail }>(
+        `/candidates/${sessionId}/${candidateId}`
       );
       return response.data.data;
     },
@@ -39,8 +37,8 @@ export const useSearchCandidates = (sessionId: string | undefined, filters: Sear
     queryKey: ['candidates-search', sessionId, JSON.stringify(filters)],
     queryFn: async () => {
       if (!sessionId) throw new Error('Session ID is required');
-      const response = await axios.get<{ data: SearchResult }>(
-        `${API_BASE_URL}/api/v1/candidates/${sessionId}/search`,
+      const response = await apiClient.get<{ data: SearchResult }>(
+        `/candidates/${sessionId}/search`,
         { params: filters }
       );
       return response.data.data;
@@ -54,8 +52,8 @@ export const useRankCandidates = () => {
 
   return useMutation({
     mutationFn: async (sessionId: string) => {
-      const response = await axios.post<{ data: RankingResult }>(
-        `${API_BASE_URL}/api/v1/ranking/${sessionId}`,
+      const response = await apiClient.post<{ data: RankingResult }>(
+        `/ranking/${sessionId}`,
         {}
       );
       return response.data.data;
@@ -74,8 +72,8 @@ export const useCompareCandidates = (sessionId: string | undefined, candidateId1
       if (!sessionId || !candidateId1 || !candidateId2) {
         throw new Error('Session ID and both Candidate IDs are required');
       }
-      const response = await axios.get<{ data: any }>(
-        `${API_BASE_URL}/api/v1/candidates/${sessionId}/compare`,
+      const response = await apiClient.get<{ data: any }>(
+        `/candidates/${sessionId}/compare`,
         {
           params: { candidate1_id: candidateId1, candidate2_id: candidateId2 },
         }
@@ -91,8 +89,8 @@ export const useFitScoreBreakdown = (sessionId: string | undefined, candidateId:
     queryKey: ['fit-score-breakdown', sessionId, candidateId],
     queryFn: async () => {
       if (!sessionId || !candidateId) throw new Error('Session ID and Candidate ID are required');
-      const response = await axios.get<{ data: any }>(
-        `${API_BASE_URL}/api/v1/candidates/${sessionId}/${candidateId}/fit-breakdown`
+      const response = await apiClient.get<{ data: any }>(
+        `/candidates/${sessionId}/${candidateId}/fit-breakdown`
       );
       return response.data.data;
     },

@@ -1,16 +1,14 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import { apiClient } from '../../api/client';
 import type { RecruitingInsights, ExportOptions } from '../../types';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const useInsights = (sessionId: string | undefined) => {
   return useQuery({
     queryKey: ['insights', sessionId],
     queryFn: async () => {
       if (!sessionId) throw new Error('Session ID is required');
-      const response = await axios.get<{ data: RecruitingInsights }>(
-        `${API_BASE_URL}/api/v1/insights/${sessionId}`
+      const response = await apiClient.get<{ data: RecruitingInsights }>(
+        `/insights/${sessionId}`
       );
       return response.data.data;
     },
@@ -23,8 +21,8 @@ export const useExportResults = () => {
   return useMutation({
     mutationFn: async (data: { session_id: string; options: ExportOptions }) => {
       const isPdf = data.options.format === 'pdf';
-      const response = await axios.post(
-        `${API_BASE_URL}/api/v1/export/${data.session_id}`,
+      const response = await apiClient.post(
+        `/export/${data.session_id}`,
         data.options,
         {
           responseType: isPdf ? 'blob' : 'json',

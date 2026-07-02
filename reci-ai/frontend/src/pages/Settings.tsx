@@ -3,6 +3,7 @@ import { PageContainer } from '../components/layout/PageContainer';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Shield, Server, Database } from 'lucide-react';
+import { API_URL } from '../api/client';
 
 export const Settings: React.FC = () => {
   return (
@@ -23,7 +24,7 @@ export const Settings: React.FC = () => {
               <input
                 type="text"
                 disabled
-                value={import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}
+                value={API_URL}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 font-mono"
               />
               <p className="mt-1 text-[10px] text-slate-500">

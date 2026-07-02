@@ -1,8 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { apiClient } from '../../api/client';
 import type { HiringSession, ProcessingStatus } from '../../types';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // Query hooks
 export const useCreateSession = () => {
@@ -10,8 +8,8 @@ export const useCreateSession = () => {
 
   return useMutation({
     mutationFn: async (roleTitle: string) => {
-      const response = await axios.post<{ data: HiringSession }>(
-        `${API_BASE_URL}/api/v1/sessions`,
+      const response = await apiClient.post<{ data: HiringSession }>(
+        `/sessions`,
         { role_title: roleTitle }
       );
       return response.data.data;
@@ -28,8 +26,8 @@ export const useSession = (sessionId: string | undefined) => {
     queryKey: ['session', sessionId],
     queryFn: async () => {
       if (!sessionId) throw new Error('Session ID is required');
-      const response = await axios.get<{ data: HiringSession }>(
-        `${API_BASE_URL}/api/v1/sessions/${sessionId}`
+      const response = await apiClient.get<{ data: HiringSession }>(
+        `/sessions/${sessionId}`
       );
       return response.data.data;
     },
@@ -42,8 +40,8 @@ export const useSessions = () => {
   return useQuery({
     queryKey: ['sessions'],
     queryFn: async () => {
-      const response = await axios.get<{ data: HiringSession[] }>(
-        `${API_BASE_URL}/api/v1/sessions`
+      const response = await apiClient.get<{ data: HiringSession[] }>(
+        `/sessions`
       );
       return response.data.data;
     },
@@ -56,7 +54,7 @@ export const useDeleteSession = () => {
 
   return useMutation({
     mutationFn: async (sessionId: string) => {
-      await axios.delete(`${API_BASE_URL}/api/v1/sessions/${sessionId}`);
+      await apiClient.delete(`/sessions/${sessionId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sessions'] });
@@ -69,8 +67,8 @@ export const useSessionProcessingStatus = (sessionId: string | undefined) => {
     queryKey: ['session-processing', sessionId],
     queryFn: async () => {
       if (!sessionId) throw new Error('Session ID is required');
-      const response = await axios.get<{ data: ProcessingStatus }>(
-        `${API_BASE_URL}/api/v1/sessions/${sessionId}/processing-status`
+      const response = await apiClient.get<{ data: ProcessingStatus }>(
+        `/sessions/${sessionId}/processing-status`
       );
       return response.data.data;
     },
