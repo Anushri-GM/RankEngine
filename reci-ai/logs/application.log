@@ -16,3 +16,11 @@
 2026-07-02 11:02:56,297 | INFO | reci.app | session_created
 2026-07-02 11:02:56,299 | INFO | reci.app | demo_session_created
 2026-07-02 11:11:52,421 | INFO | reci.app | health_checked
+2026-07-02 12:31:01,054 | INFO | reci.app | health_checked
+2026-07-02 12:31:01,086 | INFO | reci.app | session_created
+2026-07-02 12:31:01,188 | INFO | reci.app | session_created
+2026-07-02 12:31:01,193 | INFO | reci.app | demo_session_created
+2026-07-02 12:31:01,654 | INFO | reci.app | session_created
+2026-07-02 12:31:01,719 | INFO | reci.app | session_created
+2026-07-02 12:31:01,764 | INFO | reci.app | upload_saved
+2026-07-02 12:31:01,866 | INFO | reci.app | candidates_processed
