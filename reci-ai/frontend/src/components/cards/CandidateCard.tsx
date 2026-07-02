@@ -94,7 +94,10 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
         <div className="flex gap-2">
           {onViewDetails && (
             <button
-              onClick={onViewDetails}
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewDetails();
+              }}
               className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
             >
               View Details
@@ -103,7 +106,10 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
           )}
           {onCompare && (
             <button
-              onClick={onCompare}
+              onClick={(e) => {
+                e.stopPropagation();
+                onCompare();
+              }}
               className="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg font-medium transition-colors"
             >
               Compare
@@ -147,12 +153,16 @@ export const SessionCard: React.FC<SessionCardProps> = ({
 
   return (
     <Card hoverable className={`p-6 ${className}`}>
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">{session.role_title}</h3>
-          <p className="text-sm text-gray-600">{session.session_id}</p>
+      <div className="flex justify-between items-start mb-4 gap-4">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate" title={session.role_title}>
+            {session.role_title}
+          </h3>
+          <p className="text-sm text-gray-600 font-mono truncate" title={session.session_id}>
+            {session.session_id}
+          </p>
         </div>
-        <Badge variant="primary" size="sm" className={statusColors[session.status as keyof typeof statusColors] || 'bg-gray-100'}>
+        <Badge variant="primary" size="sm" className={`flex-shrink-0 ${statusColors[session.status as keyof typeof statusColors] || 'bg-gray-100'}`}>
           {session.status.replace(/_/g, ' ')}
         </Badge>
       </div>

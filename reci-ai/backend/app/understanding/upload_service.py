@@ -30,7 +30,7 @@ class UploadService:
 
     def create_session(self) -> Dict[str, Any]:
         self._cleanup_expired_sessions()
-        session_id = f"session_{uuid4().hex}"
+        session_id = f"session_{uuid4().hex[:8]}"
         session_dir = self.base_upload_dir / session_id
         session_dir.mkdir(parents=True, exist_ok=True)
 

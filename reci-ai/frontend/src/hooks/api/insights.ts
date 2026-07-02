@@ -22,28 +22,37 @@ export const useInsights = (sessionId: string | undefined) => {
 export const useExportResults = () => {
   return useMutation({
     mutationFn: async (data: { session_id: string; options: ExportOptions }) => {
-      const response = await axios.post<{ data: ExportResult }>(
+      const isPdf = data.options.format === 'pdf';
+      const response = await axios.post(
         `${API_BASE_URL}/api/v1/export/${data.session_id}`,
         data.options,
         {
-          responseType: data.options.format === 'pdf' ? 'blob' : 'json',
+          responseType: isPdf ? 'blob' : 'json',
         }
       );
 
-      if (data.options.format === 'pdf') {
-        // Handle PDF blob
-        const url = window.URL.createObjectURL(response.data as any);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `ranking_results_${data.session_id}.pdf`);
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode?.removeChild(link);
-        window.URL.revokeObjectURL(url);
-        return { success: true };
+      let blob: Blob;
+      const filename = `ranking_results_${data.session_id}.${data.options.format}`;
+
+      if (isPdf) {
+        blob = response.data;
+      } else {
+        const payload = response.data.data;
+        const rawContent = payload.data_raw || JSON.stringify(payload, null, 2);
+        const mimeType = data.options.format === 'json' ? 'application/json' : 'text/csv';
+        blob = new Blob([rawContent], { type: mimeType });
       }
 
-      return response.data.data;
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      return { success: true };
     },
   });
 };

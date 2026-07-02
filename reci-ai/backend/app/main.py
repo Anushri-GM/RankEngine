@@ -233,12 +233,17 @@ def _auto_init_demo_data() -> None:
                     sm = scores_item.get("skill_match", {})
                     cm = scores_item.get("career_match", {})
                     
-                    technical = float(sm.get("overall", 0))
+                    # calculate required skills match percentage
+                    req_skills = job_intel.get("required_skills", [])
+                    matched_req = sm.get("required_matched", [])
+                    score_req = (len(matched_req) / max(1, len(req_skills))) * 100 if req_skills else 0
+                    
+                    technical = float(sm.get("match_percent", 0))
                     career = float(cm.get("experience_score", 0))
-                    behavior = float(c.get("profile_completeness_score", 85.0) or 85.0)
+                    behavior = float(c.get("profile_completeness", 85.0) or 85.0)
                     experience = float(cm.get("experience_score", 0))
-                    domain = float(sm.get("score_req", 0) * 0.8 + 20)
-                    trust = float(c.get("profile_completeness_score", 90.0) or 90.0)
+                    domain = float(score_req * 0.8 + 20)
+                    trust = float(c.get("profile_completeness", 90.0) or 90.0)
                     
                     overall_fit = round((technical * 0.4) + (career * 0.3) + (behavior * 0.1) + (experience * 0.2), 2)
                     
@@ -264,6 +269,49 @@ def _auto_init_demo_data() -> None:
                         c["recommendation"] = "good_match"
                     else:
                         c["recommendation"] = "potential_match"
+
+                    # Populate matched_skills
+                    req_matched = sm.get("required_matched", []) or []
+                    pref_matched = sm.get("preferred_matched", []) or []
+                    
+                    matched_payload = []
+                    for s in req_matched:
+                        matched_payload.append({
+                            "skill_name": s,
+                            "proficiency": "expert",
+                            "match_type": "exact",
+                            "evidence": [{
+                                "source_type": "experience",
+                                "source_name": "Resume Profile",
+                                "description": f"Verified required skill: {s}",
+                                "verified": True
+                            }]
+                        })
+                    for s in pref_matched:
+                        if not any(x["skill_name"] == s for x in matched_payload):
+                            matched_payload.append({
+                                "skill_name": s,
+                                "proficiency": "intermediate",
+                                "match_type": "exact",
+                                "evidence": [{
+                                    "source_type": "experience",
+                                    "source_name": "Resume Profile",
+                                    "description": f"Verified preferred skill: {s}",
+                                    "verified": True
+                                }]
+                            })
+                    c["matched_skills"] = matched_payload
+                    
+                    # Populate missing_skills
+                    req_missing = sm.get("required_missing", []) or []
+                    missing_payload = []
+                    for s in req_missing:
+                        missing_payload.append({
+                            "name": s,
+                            "proficiency": "beginner",
+                            "importance": "critical"
+                        })
+                    c["missing_skills"] = missing_payload
                 else:
                     c["scores"] = {
                         "overall_fit": 0.0,
@@ -275,6 +323,8 @@ def _auto_init_demo_data() -> None:
                         "domain": 0.0,
                     }
                     c["recommendation"] = "potential_match"
+                    c["matched_skills"] = []
+                    c["missing_skills"] = []
         except Exception as exc:
             app_logger.warning("failed_to_score_demo_candidates", extra={"error": str(exc)})
 

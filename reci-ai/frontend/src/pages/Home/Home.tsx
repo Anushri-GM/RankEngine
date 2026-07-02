@@ -178,6 +178,10 @@ export const HomePage: React.FC = () => {
                     onOpen={() => {
                       if (session.status === 'new') {
                         navigate(`/upload/${session.session_id}`);
+                      } else if (session.status === 'job_uploaded') {
+                        navigate(`/job-review/${session.session_id}`);
+                      } else if (session.status === 'job_reviewed') {
+                        navigate(`/processing/${session.session_id}`);
                       } else {
                         navigate(`/workspace/${session.session_id}`);
                       }
