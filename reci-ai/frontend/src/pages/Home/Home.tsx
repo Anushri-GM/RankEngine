@@ -15,15 +15,25 @@ import {
   Clock,
 } from 'lucide-react';
 
+const STATUS_CONFIG: Record<string, { label: string; variant: 'neutral' | 'info' | 'primary' | 'warning' | 'success' | 'danger' }> = {
+  new:              { label: 'New',            variant: 'neutral' },
+  job_uploaded:     { label: 'JD Uploaded',    variant: 'info' },
+  job_reviewed:     { label: 'Reviewed',       variant: 'primary' },
+  candidates_parsed:{ label: 'Parsed',         variant: 'warning' },
+  processing:       { label: 'Processing',     variant: 'warning' },
+  completed:        { label: 'Completed',      variant: 'success' },
+  error:            { label: 'Error',          variant: 'danger' },
+};
+
 const STAGGER = {
   hidden: {},
   show: { transition: { staggerChildren: 0.05 } },
-};
+} as const;
 
 const ITEM = {
   hidden: { opacity: 0, y: 12 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
-};
+  show:   { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' as const } },
+} as const;
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
