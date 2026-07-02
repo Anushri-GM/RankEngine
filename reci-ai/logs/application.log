@@ -108,3 +108,7 @@
 2026-07-02 19:25:35,641 | INFO | reci.app | demo_session_created
 2026-07-02 19:28:27,103 | INFO | reci.app | startup
 2026-07-02 19:28:27,538 | INFO | reci.app | demo_data_already_present
+2026-07-02 19:28:29,725 | INFO | reci.app | startup
+2026-07-02 19:28:30,776 | INFO | reci.app | demo_data_already_present
+2026-07-02 19:28:32,080 | INFO | reci.app | startup
+2026-07-02 19:28:32,726 | INFO | reci.app | demo_data_already_present
