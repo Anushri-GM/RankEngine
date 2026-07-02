@@ -97,7 +97,15 @@ export const HomePage: React.FC = () => {
             </div>
 
             {createSessionMutation.isError && (
-              <p className="text-red-600 text-sm mt-2">Failed to create session. Please try again.</p>
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+                <p className="font-semibold">Failed to create session</p>
+                <p className="text-xs mt-1 text-red-700">
+                  {createSessionMutation.error instanceof Error ? createSessionMutation.error.message : 'Please try again.'}
+                </p>
+                <p className="text-xs mt-1 text-slate-500 font-medium">
+                  Tip: Make sure the backend is running by executing <code className="bg-slate-100 px-1 py-0.5 rounded">start_backend.bat</code>.
+                </p>
+              </div>
             )}
           </Card>
         </motion.div>
