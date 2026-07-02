@@ -200,12 +200,12 @@ export const UploadPage: React.FC = () => {
                 className={`text-center py-6 rounded-xl transition-colors ${dragActive ? 'bg-emerald-50/50 border border-emerald-200' : ''}`}
               >
                 <p className="text-sm text-slate-500 mb-3">
-                  Drag & drop candidate data (JSON only)
+                  Drag & drop candidate data (JSON, CSV, or Excel)
                 </p>
 
                 <input
                   type="file"
-                  accept=".json"
+                  accept=".json,.csv,.xlsx"
                   onChange={(e) => e.target.files && setCandidateFile(e.target.files[0])}
                   className="hidden"
                   id="candidate-file"

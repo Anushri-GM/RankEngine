@@ -1,3 +1,4 @@
+import csv
 import hashlib
 import io
 import json
@@ -70,7 +71,12 @@ class UploadService:
         if kind == "job":
             self._validate_docx_bytes(file_bytes)
         else:
-            self._validate_json_bytes(file_bytes)
+            if suffix == ".json":
+                self._validate_json_bytes(file_bytes)
+            elif suffix == ".csv":
+                self._validate_csv_bytes(file_bytes)
+            elif suffix in [".xlsx"]:
+                self._validate_excel_bytes(file_bytes)
 
         session_dir = Path(session["upload_dir"])
         target_name = "job_description.docx" if kind == "job" else "candidates.json"
@@ -128,13 +134,21 @@ class UploadService:
         if not stored_path.exists():
             raise ValueError("Candidate file was not stored successfully")
 
+        suffix = Path(file_name).suffix.lower()
         try:
-            raw_candidates = Loader.load_json_bytes(file_bytes)
+            if suffix == ".json":
+                raw_candidates = Loader.load_json_bytes(file_bytes)
+            elif suffix == ".csv":
+                raw_candidates = Loader.load_csv_bytes(file_bytes)
+            elif suffix in [".xlsx"]:
+                raw_candidates = Loader.load_excel_bytes(file_bytes)
+            else:
+                raise ValueError(f"Unsupported candidate file type: {suffix}")
         except Exception as exc:
-            raise ValueError(f"Invalid JSON payload: {exc}") from exc
+            raise ValueError(f"Failed to parse candidate dataset: {exc}") from exc
 
         if not isinstance(raw_candidates, list) or not raw_candidates:
-            raise ValueError("Candidate dataset is empty or not a JSON array")
+            raise ValueError("Candidate dataset is empty or not formatted correctly")
 
         validation_report = ValidationEngine.validate_candidate_dataset(raw_candidates)
         if validation_report.failures:
@@ -257,6 +271,27 @@ class UploadService:
             raise ValueError("Invalid JSON payload") from exc
         if not isinstance(payload, list):
             raise ValueError("Candidate dataset must be a JSON array")
+
+    def _validate_csv_bytes(self, file_bytes: bytes) -> None:
+        try:
+            content = file_bytes.decode("utf-8-sig")
+            reader = csv.DictReader(io.StringIO(content))
+            rows = list(reader)
+            if not rows:
+                raise ValueError("CSV file is empty")
+        except Exception as exc:
+            raise ValueError(f"Invalid CSV payload: {exc}") from exc
+
+    def _validate_excel_bytes(self, file_bytes: bytes) -> None:
+        try:
+            import openpyxl
+            wb = openpyxl.load_workbook(io.BytesIO(file_bytes), read_only=True)
+            sheet = wb.active
+            # check if there is data beyond header
+            if sheet.max_row <= 1:
+                raise ValueError("Excel sheet is empty or contains only headers")
+        except Exception as exc:
+            raise ValueError(f"Invalid Excel payload: {exc}") from exc
 
     def _write_session_payload(self, session_id: str, payload: Dict[str, Any]) -> None:
         session_file = self.base_upload_dir / f"{session_id}.json"

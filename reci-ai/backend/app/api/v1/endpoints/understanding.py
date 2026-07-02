@@ -83,12 +83,19 @@ async def upload_candidates(file: UploadFile = File(...)):
     """
     Accepts JSON candidate dataset, validates inputs, normalizes fields, generates behavior profiles, and dumps outputs.
     """
-    if not file.filename.endswith(".json"):
-        raise HTTPException(status_code=400, detail="Candidate Dataset must be a .json file")
+    from pathlib import Path
+    suffix = Path(file.filename).suffix.lower()
+    if suffix not in [".json", ".csv", ".xlsx"]:
+        raise HTTPException(status_code=400, detail="Candidate Dataset must be a .json, .csv, or .xlsx file")
         
     try:
         content = await file.read()
-        raw_candidates = Loader.load_json_bytes(content)
+        if suffix == ".json":
+            raw_candidates = Loader.load_json_bytes(content)
+        elif suffix == ".csv":
+            raw_candidates = Loader.load_csv_bytes(content)
+        elif suffix == ".xlsx":
+            raw_candidates = Loader.load_excel_bytes(content)
         
         # 1. Run Validation Engine
         validation_report = ValidationEngine.validate_candidate_dataset(raw_candidates)

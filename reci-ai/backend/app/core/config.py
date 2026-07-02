@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     SESSION_TIMEOUT_SECONDS: int = Field(default=86_400)
     MAX_UPLOAD_SIZE_BYTES: int = Field(default=5_000_000)
     ALLOWED_JOB_EXTENSIONS: tuple[str, ...] = (".docx",)
-    ALLOWED_CANDIDATE_EXTENSIONS: tuple[str, ...] = (".json",)
+    ALLOWED_CANDIDATE_EXTENSIONS: tuple[str, ...] = (".json", ".csv", ".xlsx")
     CORS_ORIGINS: str = Field(default="*")
     DEMO_MODE: bool = Field(default=True)
     LIGHTWEIGHT_MODE: bool = Field(default=True)

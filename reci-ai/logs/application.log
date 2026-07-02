@@ -112,3 +112,17 @@
 2026-07-02 19:28:30,776 | INFO | reci.app | demo_data_already_present
 2026-07-02 19:28:32,080 | INFO | reci.app | startup
 2026-07-02 19:28:32,726 | INFO | reci.app | demo_data_already_present
+2026-07-02 20:50:17,919 | INFO | reci.app | startup
+2026-07-02 20:50:18,332 | INFO | reci.app | demo_data_already_present
+2026-07-02 20:50:41,899 | INFO | reci.app | session_created
+2026-07-02 20:50:41,900 | INFO | reci.app | demo_session_created
+2026-07-02 20:52:27,875 | INFO | reci.app | session_created
+2026-07-02 20:52:27,878 | INFO | reci.app | session_created_with_title
+2026-07-02 20:52:53,891 | INFO | reci.app | upload_saved
+2026-07-02 20:52:54,422 | INFO | reci.app | job_processed
+2026-07-02 20:55:52,981 | INFO | reci.app | startup
+2026-07-02 20:55:53,820 | INFO | reci.app | demo_data_already_present
+2026-07-02 20:56:01,833 | INFO | reci.app | startup
+2026-07-02 20:56:02,352 | INFO | reci.app | demo_data_already_present
+2026-07-02 20:56:13,922 | INFO | reci.app | startup
+2026-07-02 20:56:14,439 | INFO | reci.app | demo_data_already_present

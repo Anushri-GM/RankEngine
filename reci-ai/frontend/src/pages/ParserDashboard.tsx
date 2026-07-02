@@ -236,15 +236,15 @@ export const ParserDashboard: React.FC = () => {
           <Card>
             <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4 flex items-center">
               <Database className="h-4 w-4 mr-2 text-slate-500" />
-              Upload Candidate Dataset (.json)
+              Upload Candidate Dataset (.json, .csv, .xlsx)
             </h3>
             <form onSubmit={handleCandidatesUpload} className="space-y-4">
               <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100/50 transition-colors">
                 <FileText className="h-8 w-8 text-slate-500 mb-2" />
-                <span className="text-xs font-semibold text-slate-600">Select JSON Dataset</span>
+                <span className="text-xs font-semibold text-slate-600">Select Candidate Dataset</span>
                 <input
                   type="file"
-                  accept=".json"
+                  accept=".json,.csv,.xlsx"
                   onChange={(e) => setCandidatesFile(e.target.files ? e.target.files[0] : null)}
                   className="mt-2 text-xs text-slate-500"
                 />
