@@ -2,9 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import type { CandidateProfile } from '../../types';
 import { Card, Badge } from '../common';
-import { formatScore, getScoreColor, getRecommendationLabel } from '../../utils/formatters';
-import { ChevronRight, Award } from 'lucide-react';
+import { formatScore, getRecommendationLabel } from '../../utils/formatters';
+import { ChevronRight, GitCompare, MapPin, CheckCircle2 } from 'lucide-react';
 
+/* ─────────────────────────────────────────────────────────────────
+   Candidate Card
+───────────────────────────────────────────────────────────────── */
 interface CandidateCardProps {
   candidate: CandidateProfile;
   onViewDetails?: () => void;
@@ -13,6 +16,28 @@ interface CandidateCardProps {
   className?: string;
 }
 
+const getScoreMeta = (score: number): { color: string; bg: string } => {
+  if (score >= 80) return { color: '#10B981', bg: '#D1FAE5' };
+  if (score >= 60) return { color: '#4F46E5', bg: '#EEF2FF' };
+  if (score >= 40) return { color: '#F59E0B', bg: '#FEF3C7' };
+  return { color: '#64748B', bg: '#F1F5F9' };
+};
+
+const ScorePill: React.FC<{ label: string; value: number }> = ({ label, value }) => {
+  const { color, bg } = getScoreMeta(value);
+  return (
+    <div className="flex flex-col items-center">
+      <div
+        className="text-xs font-bold px-2 py-0.5 rounded-full"
+        style={{ color, background: bg }}
+      >
+        {formatScore(value)}
+      </div>
+      <span className="text-[10px] text-slate-400 mt-1 font-medium">{label}</span>
+    </div>
+  );
+};
+
 export const CandidateCard: React.FC<CandidateCardProps> = ({
   candidate,
   onViewDetails,
@@ -20,107 +45,104 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
   isSelected = false,
   className = '',
 }) => {
+  const rec = candidate.recommendation;
+  const recVariant =
+    rec === 'strong_match' ? 'success' :
+    rec === 'good_match'   ? 'info' : 'warning';
+
   return (
-    <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
+    <div
+      className={`reci-card reci-card-hover p-5 flex flex-col gap-4 cursor-pointer relative transition-all duration-200
+        ${isSelected
+          ? 'ring-2 ring-indigo-500 ring-offset-1'
+          : 'hover:shadow-[0_8px_30px_rgba(79,70,229,0.08)]'
+        }
+        ${className}`}
     >
-      <Card
-        hoverable
-        className={`p-6 cursor-pointer relative border-2 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-transparent'} ${className}`}
-      >
-        {isSelected && (
-          <div className="absolute top-3 right-3 bg-blue-500 text-white rounded-full p-2">
-            <Award size={16} />
-          </div>
-        )}
-
-        {/* Header */}
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-slate-900 mb-1">{candidate.name}</h3>
-          <p className="text-sm text-slate-600">{candidate.location}</p>
-        </div>
-
-        {/* Score Summary */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <p className="text-xs text-slate-600 font-medium mb-1">Overall Fit</p>
-            <p className={`text-2xl font-bold ${getScoreColor(candidate.overall_fit_score)}`}>
-              {formatScore(candidate.overall_fit_score)}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-slate-600 font-medium mb-1">Trust Score</p>
-            <p className={`text-2xl font-bold ${getScoreColor(candidate.recruiter_trust_score)}`}>
-              {formatScore(candidate.recruiter_trust_score)}
-            </p>
+      {/* Selected indicator */}
+      {isSelected && (
+        <div className="absolute top-3 right-3">
+          <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center shadow-md">
+            <CheckCircle2 size={14} className="text-white" />
           </div>
         </div>
+      )}
 
-        {/* Fit Components */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <div className="text-center">
-            <p className="text-xs text-slate-500 mb-1">Technical</p>
-            <p className="text-sm font-semibold text-slate-900">{formatScore(candidate.technical_fit)}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-slate-500 mb-1">Career</p>
-            <p className="text-sm font-semibold text-slate-900">{formatScore(candidate.career_fit)}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-slate-500 mb-1">Behavior</p>
-            <p className="text-sm font-semibold text-slate-900">{formatScore(candidate.behavior_fit)}</p>
-          </div>
+      {/* Header */}
+      <div className="flex items-start gap-3 pr-4">
+        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          {candidate.name.charAt(0).toUpperCase()}
         </div>
-
-        {/* Recommendation */}
-        <div className="mb-4">
-          <Badge
-            variant={candidate.recommendation === 'strong_match' ? 'success' : candidate.recommendation === 'good_match' ? 'info' : 'warning'}
-            size="sm"
-          >
-            {getRecommendationLabel(candidate.recommendation)}
-          </Badge>
+        <div className="min-w-0 flex-1">
+          <h3 className="font-semibold text-slate-900 text-sm truncate">{candidate.name}</h3>
+          {candidate.location && (
+            <div className="flex items-center gap-1 mt-0.5">
+              <MapPin size={10} className="text-slate-400 flex-shrink-0" />
+              <p className="text-xs text-slate-500 truncate">{candidate.location}</p>
+            </div>
+          )}
         </div>
-
-        {/* Rank */}
         {candidate.rank && (
-          <div className="flex items-center justify-between mb-4 pb-4 border-t border-gray-200">
-            <span className="text-sm text-gray-600">Rank #{candidate.rank}</span>
-          </div>
+          <span className="text-[10px] font-bold text-slate-400 flex-shrink-0">#{candidate.rank}</span>
         )}
+      </div>
 
-        {/* Actions */}
-        <div className="flex gap-2">
-          {onViewDetails && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onViewDetails();
-              }}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-            >
-              View Details
-              <ChevronRight size={16} />
-            </button>
-          )}
-          {onCompare && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onCompare();
-              }}
-              className="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg font-medium transition-colors"
-            >
-              Compare
-            </button>
-          )}
+      {/* Primary Scores */}
+      <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl">
+        <div>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Overall Fit</p>
+          <p className="text-xl font-bold score-overall">{formatScore(candidate.overall_fit_score)}</p>
         </div>
-      </Card>
-    </motion.div>
+        <div>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Trust Score</p>
+          <p className="text-xl font-bold score-trust">{formatScore(candidate.recruiter_trust_score)}</p>
+        </div>
+      </div>
+
+      {/* Sub Scores */}
+      <div className="flex items-center justify-between px-1">
+        <ScorePill label="Technical" value={candidate.technical_fit} />
+        <div className="w-px h-6 bg-slate-100" />
+        <ScorePill label="Career" value={candidate.career_fit} />
+        <div className="w-px h-6 bg-slate-100" />
+        <ScorePill label="Behavior" value={candidate.behavior_fit} />
+      </div>
+
+      {/* Recommendation */}
+      <div className="flex items-center justify-between">
+        <Badge variant={recVariant} size="sm">
+          {getRecommendationLabel(rec)}
+        </Badge>
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-2 pt-1 border-t border-slate-100">
+        {onViewDetails && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onViewDetails(); }}
+            className="flex-1 flex items-center justify-center gap-1.5 btn btn-primary btn-sm"
+          >
+            View Details
+            <ChevronRight size={13} />
+          </button>
+        )}
+        {onCompare && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onCompare(); }}
+            className="btn btn-secondary btn-sm px-3"
+            title="Add to Compare"
+          >
+            <GitCompare size={14} />
+          </button>
+        )}
+      </div>
+    </div>
   );
 };
 
+/* ─────────────────────────────────────────────────────────────────
+   Session Card  (used on Home page)
+───────────────────────────────────────────────────────────────── */
 interface SessionCardProps {
   session: {
     session_id: string;
@@ -135,6 +157,16 @@ interface SessionCardProps {
   className?: string;
 }
 
+const SESSION_STATUS: Record<string, { label: string; variant: 'neutral' | 'info' | 'primary' | 'warning' | 'success' | 'danger' }> = {
+  new:               { label: 'New',          variant: 'neutral'  },
+  job_uploaded:      { label: 'JD Uploaded',  variant: 'info'     },
+  job_reviewed:      { label: 'Reviewed',     variant: 'primary'  },
+  candidates_parsed: { label: 'Parsed',       variant: 'warning'  },
+  processing:        { label: 'Processing',   variant: 'warning'  },
+  completed:         { label: 'Completed',    variant: 'success'  },
+  error:             { label: 'Error',        variant: 'danger'   },
+};
+
 export const SessionCard: React.FC<SessionCardProps> = ({
   session,
   onOpen,
@@ -142,64 +174,49 @@ export const SessionCard: React.FC<SessionCardProps> = ({
   onExport,
   className = '',
 }) => {
-  const statusColors = {
-    new: 'bg-gray-100 text-gray-800',
-    job_uploaded: 'bg-blue-100 text-blue-800',
-    job_reviewed: 'bg-purple-100 text-purple-800',
-    processing: 'bg-yellow-100 text-yellow-800',
-    completed: 'bg-green-100 text-green-800',
-    error: 'bg-red-100 text-red-800',
-  };
+  const cfg = SESSION_STATUS[session.status] ?? { label: session.status, variant: 'neutral' as const };
 
   return (
-    <Card hoverable className={`p-6 ${className}`}>
-      <div className="flex justify-between items-start mb-4 gap-4">
+    <Card hoverable className={`p-5 flex flex-col h-full ${className}`}>
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3 mb-4">
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate" title={session.role_title}>
+          <h3 className="font-semibold text-slate-900 truncate text-sm" title={session.role_title}>
             {session.role_title}
           </h3>
-          <p className="text-sm text-gray-600 font-mono truncate" title={session.session_id}>
+          <p className="text-xs text-slate-400 font-mono truncate mt-0.5" title={session.session_id}>
             {session.session_id}
           </p>
         </div>
-        <Badge variant="primary" size="sm" className={`flex-shrink-0 ${statusColors[session.status as keyof typeof statusColors] || 'bg-gray-100'}`}>
-          {session.status.replace(/_/g, ' ')}
-        </Badge>
+        <Badge variant={cfg.variant} size="sm">{cfg.label}</Badge>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4 pb-4 border-t border-gray-200">
+      {/* Meta */}
+      <div className="grid grid-cols-2 gap-3 py-3 border-t border-b border-slate-100 mb-4 text-xs">
         <div>
-          <p className="text-xs text-gray-600 font-medium">Created</p>
-          <p className="text-sm font-semibold text-gray-900">{new Date(session.created_at).toLocaleDateString()}</p>
+          <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide mb-0.5">Created</p>
+          <p className="font-medium text-slate-700">{new Date(session.created_at).toLocaleDateString()}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-600 font-medium">Candidates</p>
-          <p className="text-sm font-semibold text-gray-900">{session.candidate_count || 'N/A'}</p>
+          <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide mb-0.5">Candidates</p>
+          <p className="font-medium text-slate-700">{session.candidate_count ?? '—'}</p>
         </div>
       </div>
 
-      <div className="flex gap-2">
+      {/* Actions */}
+      <div className="flex gap-2 mt-auto">
         {onOpen && (
-          <button
-            onClick={onOpen}
-            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-          >
+          <button onClick={onOpen} className="flex-1 btn btn-primary btn-sm justify-center">
             Open
           </button>
         )}
         {onExport && (
-          <button
-            onClick={onExport}
-            className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium transition-colors"
-          >
+          <button onClick={onExport} className="btn btn-secondary btn-sm px-3">
             Export
           </button>
         )}
         {onDelete && (
-          <button
-            onClick={onDelete}
-            className="flex-1 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg font-medium transition-colors"
-          >
+          <button onClick={onDelete} className="btn btn-ghost btn-sm px-2.5 text-red-500 hover:bg-red-50">
             Delete
           </button>
         )}

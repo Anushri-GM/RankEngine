@@ -46,17 +46,17 @@ export const JobReviewPage: React.FC = () => {
 
   if (jobLoading || !sessionId) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Spinner size="lg" />
       </div>
     );
   }
 
   if (!jobUnderstanding) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="p-8 text-center">
-          <p className="text-gray-600 mb-4">Job description not found. Please upload it first.</p>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="p-8 text-center max-w-sm">
+          <p className="text-slate-600 mb-4">Job description not found. Please upload it first.</p>
           <Button onClick={() => navigate(`/upload/${sessionId}`)}>
             Go to Upload
           </Button>
@@ -66,222 +66,166 @@ export const JobReviewPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Review Job Understanding</h1>
-            <Button
-              variant="ghost"
-              onClick={() => setIsEditing(!isEditing)}
-              className="flex items-center gap-2"
-            >
-              <Edit2 size={20} />
-              {isEditing ? 'Done Editing' : 'Edit'}
-            </Button>
+    <div className="max-w-3xl mx-auto space-y-6">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900" style={{ letterSpacing: '-0.025em' }}>
+              Review Job Understanding
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">
+              Review the AI's understanding of the job before proceeding to ranking.
+            </p>
           </div>
-          <p className="text-gray-600">
-            Review the AI's understanding of the job before proceeding to ranking
-          </p>
+          <Button
+            variant="ghost"
+            onClick={() => setIsEditing(!isEditing)}
+            className="flex items-center gap-2"
+          >
+            <Edit2 size={16} />
+            {isEditing ? 'Done Editing' : 'Edit'}
+          </Button>
+        </div>
+      </motion.div>
+
+      {/* Role Title */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+        <Card className="p-5">
+          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Role Title</h2>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editedJob?.role_title || ''}
+              onChange={(e) =>
+                setEditedJob(editedJob ? { ...editedJob, role_title: e.target.value } : undefined)
+              }
+              className="reci-input"
+            />
+          ) : (
+            <p className="text-lg font-semibold text-slate-900">{jobUnderstanding.role_title}</p>
+          )}
+        </Card>
+      </motion.div>
+
+      {/* Skills */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Card className="p-5 h-full">
+            <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3 flex items-center gap-2">
+              <CheckCircle size={15} className="text-red-500" />
+              Required Skills
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {jobUnderstanding.required_skills.map((skill) => (
+                <SkillChip key={skill.name} skill={skill.name} proficiency={skill.proficiency} />
+              ))}
+            </div>
+          </Card>
         </motion.div>
 
-        {/* Job Details */}
-        <div className="space-y-6">
-          {/* Role Title */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Role Title</h2>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={editedJob?.role_title || ''}
-                  onChange={(e) =>
-                    setEditedJob(
-                      editedJob ? { ...editedJob, role_title: e.target.value } : undefined
-                    )
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              ) : (
-                <p className="text-lg text-gray-700">{jobUnderstanding.role_title}</p>
-              )}
-            </Card>
-          </motion.div>
-
-          {/* Two Column Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Required Skills */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="p-6 h-full">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <CheckCircle size={20} className="text-red-500" />
-                  Required Skills
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {jobUnderstanding.required_skills.map((skill) => (
-                    <SkillChip
-                      key={skill.name}
-                      skill={skill.name}
-                      proficiency={skill.proficiency}
-                    />
-                  ))}
-                </div>
-              </Card>
-            </motion.div>
-
-            {/* Preferred Skills */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <Card className="p-6 h-full">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Preferred Skills</h3>
-                <div className="flex flex-wrap gap-2">
-                  {jobUnderstanding.preferred_skills.map((skill) => (
-                    <SkillChip
-                      key={skill.name}
-                      skill={skill.name}
-                      proficiency={skill.proficiency}
-                    />
-                  ))}
-                </div>
-              </Card>
-            </motion.div>
-          </div>
-
-          {/* Key Information */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Information</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {jobUnderstanding.experience_required && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Experience Required
-                    </label>
-                    <p className="text-gray-900">{jobUnderstanding.experience_required}</p>
-                  </div>
-                )}
-
-                {jobUnderstanding.industry && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Industry
-                    </label>
-                    <p className="text-gray-900">{jobUnderstanding.industry}</p>
-                  </div>
-                )}
-
-                {jobUnderstanding.education_requirement && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Education Requirement
-                    </label>
-                    <p className="text-gray-900">{jobUnderstanding.education_requirement}</p>
-                  </div>
-                )}
-
-                {jobUnderstanding.location && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Location
-                    </label>
-                    <p className="text-gray-900">{jobUnderstanding.location}</p>
-                  </div>
-                )}
-              </div>
-            </Card>
-          </motion.div>
-
-          {/* Responsibilities */}
-          {jobUnderstanding.responsibilities && jobUnderstanding.responsibilities.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Responsibilities</h3>
-                <ul className="space-y-2">
-                  {jobUnderstanding.responsibilities.map((resp, idx) => (
-                    <li key={idx} className="flex gap-3 text-gray-700">
-                      <span className="text-blue-600 font-bold mt-1">•</span>
-                      <span>{resp}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Edit Actions */}
-          {isEditing && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex gap-4 justify-end pt-6 border-t border-gray-200"
-            >
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setIsEditing(false);
-                  setEditedJob(jobUnderstanding);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSaveEdits}
-                loading={updateJobMutation.isPending}
-              >
-                Save Changes
-              </Button>
-            </motion.div>
-          )}
-
-          {/* Proceed Actions */}
-          {!isEditing && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="flex gap-4 justify-end pt-6 border-t border-gray-200"
-            >
-              <Button
-                variant="secondary"
-                onClick={() => navigate(`/upload/${sessionId}`)}
-              >
-                Back
-              </Button>
-              <Button
-                onClick={handleConfirm}
-                loading={confirmJobMutation.isPending}
-              >
-                Confirm & Process
-              </Button>
-            </motion.div>
-          )}
-        </div>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+          <Card className="p-5 h-full">
+            <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
+              Preferred Skills
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {jobUnderstanding.preferred_skills.map((skill) => (
+                <SkillChip key={skill.name} skill={skill.name} proficiency={skill.proficiency} />
+              ))}
+            </div>
+          </Card>
+        </motion.div>
       </div>
+
+      {/* Key Info */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <Card className="p-5">
+          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Key Information</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {jobUnderstanding.experience_required && (
+              <div>
+                <p className="text-xs text-slate-400 font-medium mb-1">Experience</p>
+                <p className="text-sm font-semibold text-slate-800">{jobUnderstanding.experience_required}</p>
+              </div>
+            )}
+            {jobUnderstanding.industry && (
+              <div>
+                <p className="text-xs text-slate-400 font-medium mb-1">Industry</p>
+                <p className="text-sm font-semibold text-slate-800">{jobUnderstanding.industry}</p>
+              </div>
+            )}
+            {jobUnderstanding.education_requirement && (
+              <div>
+                <p className="text-xs text-slate-400 font-medium mb-1">Education</p>
+                <p className="text-sm font-semibold text-slate-800">{jobUnderstanding.education_requirement}</p>
+              </div>
+            )}
+            {jobUnderstanding.location && (
+              <div>
+                <p className="text-xs text-slate-400 font-medium mb-1">Location</p>
+                <p className="text-sm font-semibold text-slate-800">{jobUnderstanding.location}</p>
+              </div>
+            )}
+          </div>
+        </Card>
+      </motion.div>
+
+      {/* Responsibilities */}
+      {jobUnderstanding.responsibilities && jobUnderstanding.responsibilities.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+          <Card className="p-5">
+            <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Responsibilities</h3>
+            <ul className="space-y-2">
+              {jobUnderstanding.responsibilities.map((resp, idx) => (
+                <li key={idx} className="flex gap-2.5 text-sm text-slate-700">
+                  <span className="text-indigo-500 font-bold mt-0.5 flex-shrink-0">•</span>
+                  <span>{resp}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Edit Actions */}
+      {isEditing && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex gap-3 justify-end pt-2 border-t border-slate-100"
+        >
+          <Button
+            variant="secondary"
+            onClick={() => { setIsEditing(false); setEditedJob(jobUnderstanding); }}
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleSaveEdits} loading={updateJobMutation.isPending}>
+            Save Changes
+          </Button>
+        </motion.div>
+      )}
+
+      {/* Proceed Actions */}
+      {!isEditing && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex gap-3 justify-end pt-2 border-t border-slate-100"
+        >
+          <Button variant="secondary" onClick={() => navigate(`/upload/${sessionId}`)}>
+            ← Back
+          </Button>
+          <Button onClick={handleConfirm} loading={confirmJobMutation.isPending}>
+            Confirm & Process →
+          </Button>
+        </motion.div>
+      )}
     </div>
   );
 };

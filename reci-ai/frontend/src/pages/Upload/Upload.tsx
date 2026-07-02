@@ -63,35 +63,32 @@ export const UploadPage: React.FC = () => {
 
   if (sessionLoading || !sessionId) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Spinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div>
+      <div className="max-w-3xl mx-auto space-y-8">
         {/* Session Info */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <Card className="p-6 bg-white">
+          <Card className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-xl font-bold text-slate-900">
                   {session?.role_title || 'New Hiring Session'}
                 </h1>
-                <p className="text-gray-600">Session ID: {sessionId}</p>
+                <p className="text-xs text-slate-400 font-mono mt-0.5">{sessionId}</p>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-600 mb-2">Status</p>
-                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                  {session?.status.replace(/_/g, ' ').toUpperCase()}
-                </span>
-              </div>
+              <span className="badge badge-primary badge-sm">
+                {session?.status.replace(/_/g, ' ')}
+              </span>
             </div>
           </Card>
         </motion.div>
@@ -104,22 +101,22 @@ export const UploadPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="p-6 h-full flex flex-col">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Upload size={24} />
-                Job Description
-              </h2>
+            <div className="upload-card-jd flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-indigo-100 flex items-center justify-center">
+                  <Upload size={16} className="text-indigo-600" />
+                </div>
+                <h2 className="font-semibold text-slate-900">Job Description</h2>
+              </div>
 
               <div
                 onDragEnter={handleDragEnter}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, 'job')}
-                className={`flex-1 border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                  dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'
-                }`}
+                className="text-center py-6"
               >
-                <p className="text-gray-600 mb-4">
-                  Drag and drop your job description (DOCX or JSON)
+                <p className="text-sm text-slate-500 mb-3">
+                  Drag & drop your job description (DOCX or JSON)
                 </p>
 
                 <input
@@ -132,7 +129,7 @@ export const UploadPage: React.FC = () => {
 
                 <label
                   htmlFor="job-file"
-                  className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 cursor-pointer"
+                  className="btn btn-primary btn-sm cursor-pointer"
                 >
                   Browse Files
                 </label>
@@ -160,8 +157,8 @@ export const UploadPage: React.FC = () => {
               )}
 
               {uploadJobMutation.isSuccess && (
-                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800">✓ Job description uploaded successfully</p>
+                <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 font-medium">
+                  ✓ Job description uploaded successfully
                 </div>
               )}
 
@@ -169,11 +166,11 @@ export const UploadPage: React.FC = () => {
                 onClick={handleUploadJob}
                 loading={uploadJobMutation.isPending}
                 disabled={!jobFile}
-                className="mt-4 w-full"
+                className="w-full justify-center"
               >
                 Upload Job Description
               </Button>
-            </Card>
+            </div>
           </motion.div>
 
           {/* Candidate Dataset Upload */}
@@ -182,22 +179,22 @@ export const UploadPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="p-6 h-full flex flex-col">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Upload size={24} />
-                Candidate Dataset
-              </h2>
+            <div className="upload-card-candidates flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center">
+                  <Upload size={16} className="text-emerald-600" />
+                </div>
+                <h2 className="font-semibold text-slate-900">Candidate Dataset</h2>
+              </div>
 
               <div
                 onDragEnter={handleDragEnter}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, 'candidate')}
-                className={`flex-1 border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                  dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'
-                }`}
+                className="text-center py-6"
               >
-                <p className="text-gray-600 mb-4">
-                  Drag and drop candidate data (CSV, JSON, or XLSX)
+                <p className="text-sm text-slate-500 mb-3">
+                  Drag & drop candidate data (CSV, JSON, or XLSX)
                 </p>
 
                 <input
@@ -210,7 +207,7 @@ export const UploadPage: React.FC = () => {
 
                 <label
                   htmlFor="candidate-file"
-                  className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 cursor-pointer"
+                  className="btn btn-success btn-sm cursor-pointer"
                 >
                   Browse Files
                 </label>
@@ -238,38 +235,39 @@ export const UploadPage: React.FC = () => {
               )}
 
               {uploadCandidatesMutation.isSuccess && (
-                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800">✓ Candidate data uploaded successfully</p>
+                <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 font-medium">
+                  ✓ Candidate data uploaded successfully
                 </div>
               )}
 
               <Button
+                variant="success"
                 onClick={handleUploadCandidates}
                 loading={uploadCandidatesMutation.isPending}
                 disabled={!candidateFile}
-                className="mt-4 w-full"
+                className="w-full justify-center"
               >
                 Upload Candidate Dataset
               </Button>
-            </Card>
+            </div>
           </motion.div>
         </div>
 
         {/* Action Buttons */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 flex gap-4 justify-end"
+          className="flex gap-3 justify-end pt-2"
         >
           <Button variant="secondary" onClick={() => navigate('/')}>
-            Back
+            ← Back
           </Button>
           <Button
             onClick={handleProceed}
             disabled={session?.status === 'new'}
           >
-            Next: Review Job
+            Next: Review Job →
           </Button>
         </motion.div>
       </div>

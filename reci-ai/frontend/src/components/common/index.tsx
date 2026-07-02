@@ -1,87 +1,95 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
+/* ─── Skeleton ─────────────────────────────────────────────────────── */
 interface SkeletonProps {
   className?: string;
   count?: number;
 }
 
-export const SkeletonLoader: React.FC<SkeletonProps> = ({ className = 'h-12 w-full', count = 1 }) => {
-  return (
-    <div className="space-y-4">
-      {Array.from({ length: count }).map((_, i) => (
-        <div
-          key={i}
-          className={`${className} bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-pulse`}
-        />
-      ))}
-    </div>
-  );
-};
+export const SkeletonLoader: React.FC<SkeletonProps> = ({ className = 'h-12 w-full', count = 1 }) => (
+  <div className="space-y-3">
+    {Array.from({ length: count }).map((_, i) => (
+      <div
+        key={i}
+        className={`${className} bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 animate-pulse rounded-2xl`}
+      />
+    ))}
+  </div>
+);
 
+/* ─── Progress Bar ─────────────────────────────────────────────────── */
 interface ProgressBarProps {
   progress: number;
   className?: string;
-  color?: 'blue' | 'green' | 'orange' | 'red';
+  color?: 'primary' | 'success' | 'warning' | 'danger';
   animated?: boolean;
 }
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   progress,
   className = '',
-  color = 'blue',
-  animated = true,
+  color = 'primary',
+  animated = false,
 }) => {
-  const colorClasses = {
-    blue: 'bg-blue-500',
-    green: 'bg-green-500',
-    orange: 'bg-orange-500',
-    red: 'bg-red-500',
+  const colors = {
+    primary: 'bg-[#4F46E5]',
+    success: 'bg-[#10B981]',
+    warning: 'bg-[#F59E0B]',
+    danger: 'bg-[#EF4444]',
   };
 
   return (
-    <div className={`w-full bg-gray-200 rounded-full h-2 overflow-hidden ${className}`}>
+    <div className={`w-full bg-slate-100 rounded-full h-1.5 overflow-hidden ${className}`}>
       <motion.div
-        className={`h-full ${colorClasses[color]} ${animated ? 'animate-pulse' : ''}`}
+        className={`h-full ${colors[color]} ${animated ? 'animate-pulse' : ''}`}
         initial={{ width: 0 }}
         animate={{ width: `${Math.min(progress, 100)}%` }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
       />
     </div>
   );
 };
 
+/* ─── Badge ────────────────────────────────────────────────────────── */
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
+  variant?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-export const Badge: React.FC<BadgeProps> = ({ children, variant = 'primary', size = 'md', className = '' }) => {
-  const variantClasses = {
-    primary: 'bg-primary-light text-primary-dark',
-    success: 'bg-success-light text-success-dark',
-    warning: 'bg-warning-light text-warning-dark',
-    danger: 'bg-danger-light text-danger-dark',
-    info: 'bg-slate-100 text-slate-700',
+export const Badge: React.FC<BadgeProps> = ({
+  children,
+  variant = 'primary',
+  size = 'md',
+  className = '',
+}) => {
+  const variantMap = {
+    primary: 'badge-primary',
+    success: 'badge-success',
+    warning: 'badge-warning',
+    danger:  'badge-danger',
+    info:    'badge-info',
+    neutral: 'badge-neutral',
   };
 
-  const sizeClasses = {
-    sm: 'px-2 py-1 text-xs',
-    md: 'px-3 py-1 text-sm',
-    lg: 'px-4 py-2 text-base',
+  const sizeMap = {
+    sm: 'badge-sm',
+    md: 'badge-md',
+    lg: 'px-4 py-1.5 text-sm',
   };
 
   return (
-    <span className={`inline-block rounded-full font-medium ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}>
+    <span className={`badge ${variantMap[variant]} ${sizeMap[size]} ${className}`}>
       {children}
     </span>
   );
 };
 
+/* ─── Button ───────────────────────────────────────────────────────── */
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   children: React.ReactNode;
@@ -96,48 +104,65 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const variantClasses = {
-    primary: 'bg-primary text-white hover:bg-primary-dark',
-    secondary: 'bg-slate-100 text-slate-800 hover:bg-slate-200',
-    danger: 'bg-danger text-white hover:bg-danger-dark',
-    ghost: 'bg-transparent hover:bg-slate-50 text-slate-800',
+  const variantMap = {
+    primary:   'btn-primary',
+    secondary: 'btn-secondary',
+    success:   'btn-success',
+    danger:    'btn-danger',
+    ghost:     'btn-ghost',
   };
 
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
+  const sizeMap = {
+    sm: 'btn-sm',
+    md: 'btn-md',
+    lg: 'btn-lg',
   };
 
   return (
     <button
-      className={`inline-flex items-center gap-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`btn ${variantMap[variant]} ${sizeMap[size]} ${className}`}
       disabled={loading || disabled}
       {...props}
     >
-      {loading && <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />}
+      {loading && (
+        <svg
+          className="animate-spin h-4 w-4"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      )}
       {children}
     </button>
   );
 };
 
+/* ─── Card ─────────────────────────────────────────────────────────── */
 interface CardProps {
   children: React.ReactNode;
   className?: string;
   hoverable?: boolean;
+  onClick?: () => void;
 }
 
-export const Card: React.FC<CardProps> = ({ children, className = '', hoverable = false }) => {
-  return (
-    <motion.div
-      className={`bg-card rounded-xl ${hoverable ? 'hover:shadow-premium transition-shadow cursor-pointer' : 'shadow-card'} border border-gray-100 ${className}`}
-      whileHover={hoverable ? { y: -2 } : {}}
-    >
-      {children}
-    </motion.div>
-  );
-};
+export const Card: React.FC<CardProps> = ({
+  children,
+  className = '',
+  hoverable = false,
+  onClick,
+}) => (
+  <div
+    onClick={onClick}
+    className={`reci-card ${hoverable ? 'reci-card-hover cursor-pointer' : ''} ${className}`}
+  >
+    {children}
+  </div>
+);
 
+/* ─── Empty State ──────────────────────────────────────────────────── */
 interface EmptyStateProps {
   icon?: React.ReactNode;
   title: string;
@@ -146,17 +171,26 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, description, action, className = '' }) => {
-  return (
-    <div className={`text-center py-12 ${className}`}>
-      {icon && <div className="mb-4 flex justify-center text-slate-500 text-5xl">{icon}</div>}
-      <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
-      {description && <p className="text-slate-600 mb-6 max-w-sm mx-auto">{description}</p>}
-      {action && <div className="flex justify-center gap-2">{action}</div>}
-    </div>
-  );
-};
+export const EmptyState: React.FC<EmptyStateProps> = ({
+  icon,
+  title,
+  description,
+  action,
+  className = '',
+}) => (
+  <div className={`flex flex-col items-center justify-center text-center py-16 ${className}`}>
+    {icon && (
+      <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-2xl mb-4">
+        {icon}
+      </div>
+    )}
+    <h3 className="text-base font-600 text-slate-800 mb-1.5">{title}</h3>
+    {description && <p className="text-sm text-slate-500 max-w-sm mb-6">{description}</p>}
+    {action && <div className="flex gap-2">{action}</div>}
+  </div>
+);
 
+/* ─── Toast ────────────────────────────────────────────────────────── */
 interface ToastProps {
   type: 'success' | 'error' | 'info' | 'warning';
   message: string;
@@ -165,30 +199,30 @@ interface ToastProps {
 }
 
 export const Toast: React.FC<ToastProps> = ({ type, message, onClose, className = '' }) => {
-  const typeClasses = {
-    success: 'bg-green-50 text-green-800 border-green-200',
-    error: 'bg-red-50 text-red-800 border-red-200',
-    info: 'bg-blue-50 text-blue-800 border-blue-200',
-    warning: 'bg-yellow-50 text-yellow-800 border-yellow-200',
+  const typeMap = {
+    success: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    error:   'bg-red-50 text-red-800 border-red-200',
+    info:    'bg-indigo-50 text-indigo-800 border-indigo-200',
+    warning: 'bg-amber-50 text-amber-800 border-amber-200',
   };
 
   React.useEffect(() => {
     if (onClose) {
-      const timer = setTimeout(onClose, 5000);
-      return () => clearTimeout(timer);
+      const t = setTimeout(onClose, 5000);
+      return () => clearTimeout(t);
     }
   }, [onClose]);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className={`p-4 rounded-lg border ${typeClasses[type]} flex justify-between items-center gap-4 ${className}`}
+      exit={{ opacity: 0, y: -8 }}
+      className={`p-3.5 rounded-xl border ${typeMap[type]} flex justify-between items-center gap-3 text-sm font-medium ${className}`}
     >
       <span>{message}</span>
       {onClose && (
-        <button onClick={onClose} className="text-lg leading-none opacity-70 hover:opacity-100">
+        <button onClick={onClose} className="opacity-60 hover:opacity-100 text-base leading-none">
           ×
         </button>
       )}
@@ -196,6 +230,7 @@ export const Toast: React.FC<ToastProps> = ({ type, message, onClose, className 
   );
 };
 
+/* ─── Modal ────────────────────────────────────────────────────────── */
 interface ModalProps {
   isOpen: boolean;
   title?: string;
@@ -205,65 +240,77 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-export const Modal: React.FC<ModalProps> = ({ isOpen, title, children, onClose, className = '', size = 'md' }) => {
-  const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
-  };
-
-  if (!isOpen) return null;
+export const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  title,
+  children,
+  onClose,
+  className = '',
+  size = 'md',
+}) => {
+  const sizeMap = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg', xl: 'max-w-xl' };
 
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 z-40"
-        onClick={onClose}
-      />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl z-50 ${sizeClasses[size]} ${className}`}
-      >
-        {title && (
-          <div className="border-b border-slate-200 px-6 py-4 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-            <button
-              onClick={onClose}
-              className="text-slate-500 hover:text-slate-700 text-2xl leading-none"
-            >
-              ×
-            </button>
-          </div>
-        )}
-        <div className="p-6">{children}</div>
-      </motion.div>
-    </>
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-950/50 z-40 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          <motion.div
+            key="modal"
+            initial={{ opacity: 0, scale: 0.95, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 12 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl z-50 w-full ${sizeMap[size]} ${className}`}
+          >
+            {title && (
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+                <button
+                  onClick={onClose}
+                  className="w-7 h-7 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-700 transition-colors"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+            <div className="p-6">{children}</div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 
+/* ─── Spinner ──────────────────────────────────────────────────────── */
 interface SpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
 export const Spinner: React.FC<SpinnerProps> = ({ size = 'md', className = '' }) => {
-  const sizeClasses = {
-    sm: 'h-4 w-4 border-2',
-    md: 'h-8 w-8 border-3',
-    lg: 'h-12 w-12 border-4',
-  };
+  const sizeMap = { sm: 'h-4 w-4', md: 'h-8 w-8', lg: 'h-12 w-12' };
 
   return (
-    <motion.div
-      animate={{ rotate: 360 }}
-      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-      className={`border-gray-300 border-t-blue-600 rounded-full ${sizeClasses[size]} ${className}`}
-    />
+    <svg
+      className={`animate-spin text-indigo-600 ${sizeMap[size]} ${className}`}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+      />
+    </svg>
   );
 };

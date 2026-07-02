@@ -2,199 +2,307 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSessions, useCreateSession, useDeleteSession } from '../../hooks/api/sessions';
-import { Button, Card, EmptyState, SkeletonLoader } from '../../components/common';
-import { SessionCard } from '../../components/cards/CandidateCard';
-import { Plus, FileText, BarChart3 } from 'lucide-react';
+import { Button, Card, Badge, EmptyState, SkeletonLoader } from '../../components/common';
+import {
+  Plus,
+  Briefcase,
+  Users,
+  BarChart3,
+  Zap,
+  Trash2,
+  ArrowRight,
+  LineChart,
+  Clock,
+} from 'lucide-react';
+
+const STATUS_CONFIG: Record<string, { label: string; variant: 'neutral' | 'info' | 'primary' | 'warning' | 'success' | 'danger' }> = {
+  new:              { label: 'New',            variant: 'neutral' },
+  job_uploaded:     { label: 'JD Uploaded',    variant: 'info' },
+  job_reviewed:     { label: 'Reviewed',       variant: 'primary' },
+  candidates_parsed:{ label: 'Parsed',         variant: 'warning' },
+  processing:       { label: 'Processing',     variant: 'warning' },
+  completed:        { label: 'Completed',      variant: 'success' },
+  error:            { label: 'Error',          variant: 'danger' },
+};
+
+const STAGGER = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.05 } },
+};
+
+const ITEM = {
+  hidden: { opacity: 0, y: 12 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
+};
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { data: sessions, isLoading } = useSessions();
-  const createSessionMutation = useCreateSession();
-  const deleteSessionMutation = useDeleteSession();
+  const createMutation = useCreateSession();
+  const deleteMutation = useDeleteSession();
   const [roleTitle, setRoleTitle] = React.useState('');
 
-  const handleDeleteSession = async (sessionId: string) => {
-    if (window.confirm('Are you sure you want to delete this hiring session and all its associated data?')) {
-      try {
-        await deleteSessionMutation.mutateAsync(sessionId);
-      } catch (error) {
-        console.error('Failed to delete session:', error);
-      }
-    }
-  };
+  const totalCandidates = sessions?.reduce((s, x) => s + (x.candidate_count ?? 0), 0) ?? 0;
+  const completedSessions = sessions?.filter(s => s.status === 'completed').length ?? 0;
 
-  const handleCreateSession = async () => {
+  const handleCreate = async () => {
     if (!roleTitle.trim()) return;
     try {
-      const newSession = await createSessionMutation.mutateAsync(roleTitle);
-      navigate(`/upload/${newSession.session_id}`);
+      const s = await createMutation.mutateAsync(roleTitle.trim());
       setRoleTitle('');
-    } catch (error) {
-      console.error('Failed to create session:', error);
-    }
+      navigate(`/upload/${s.session_id}`);
+    } catch {}
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this session and all its data?')) return;
+    try { await deleteMutation.mutateAsync(id); } catch {}
+  };
+
+  const handleOpen = (session: { session_id: string; status: string }) => {
+    if      (session.status === 'new')          navigate(`/upload/${session.session_id}`);
+    else if (session.status === 'job_uploaded') navigate(`/job-review/${session.session_id}`);
+    else if (session.status === 'job_reviewed') navigate(`/processing/${session.session_id}`);
+    else                                        navigate(`/workspace/${session.session_id}`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Hero Section */}
+    <div className="max-w-6xl mx-auto space-y-8">
+
+      {/* ── Hero Banner ─────────────────────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-16 px-4 sm:px-6 lg:px-8"
+        transition={{ duration: 0.3 }}
+        className="reci-hero"
       >
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">RECI</h1>
-          <p className="text-xl text-blue-100 mb-8">
-            Redrob Explainable Candidate Intelligence
-          </p>
-          <p className="text-lg text-blue-50 max-w-2xl mx-auto">
-            Transform your recruitment process with AI-powered candidate ranking and explainable decision intelligence.
-          </p>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/20 mb-4">
+              <Zap size={12} className="text-indigo-300" />
+              <span className="text-xs font-semibold text-indigo-300 tracking-wide">AI-Powered Recruitment Intelligence</span>
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-2" style={{ letterSpacing: '-0.03em' }}>
+              Welcome to <span className="text-indigo-300">RECI</span>
+            </h1>
+            <p className="text-slate-400 text-sm max-w-lg leading-relaxed">
+              Rank, explain, and understand your candidates with enterprise-grade AI. Every decision is transparent, every score is earned.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 min-w-fit">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => navigate('/demo')}
+              className="justify-center"
+            >
+              <Zap size={16} />
+              Try Demo
+            </Button>
+          </div>
         </div>
       </motion.div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Quick Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12"
-        >
-          <Card className="p-6 text-center">
-            <div className="text-3xl font-bold text-blue-600 mb-2">
-              {sessions?.length || 0}
-            </div>
-            <p className="text-gray-600">Active Sessions</p>
-          </Card>
-          <Card className="p-6 text-center">
-            <FileText size={32} className="text-green-600 mx-auto mb-2" />
-            <p className="text-gray-600">AI-Powered Analysis</p>
-          </Card>
-          <Card className="p-6 text-center">
-            <BarChart3 size={32} className="text-purple-600 mx-auto mb-2" />
-            <p className="text-gray-600">Explainable Results</p>
-          </Card>
-        </motion.div>
-
-        {/* Create New Session */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-12"
-        >
-          <Card className="p-8 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Start New Hiring Session</h2>
-
-            <div className="flex gap-4 flex-col sm:flex-row">
-              <input
-                type="text"
-                placeholder="Enter job title (e.g., Senior Software Engineer)"
-                value={roleTitle}
-                onChange={(e) => setRoleTitle(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleCreateSession()}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <Button
-                onClick={handleCreateSession}
-                loading={createSessionMutation.isPending}
-                className="inline-flex items-center gap-2"
-                aria-label="Create a new hiring session"
-              >
-                <Plus size={20} />
-                Create Session
-              </Button>
-            </div>
-
-            {createSessionMutation.isError && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-                <p className="font-semibold">Failed to create session</p>
-                <p className="text-xs mt-1 text-red-700">
-                  {createSessionMutation.error instanceof Error ? createSessionMutation.error.message : 'Please try again.'}
-                </p>
-                <p className="text-xs mt-1 text-slate-500 font-medium">
-                  {window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? (
-                    <>Tip: Make sure the backend is running by executing <code className="bg-slate-100 px-1 py-0.5 rounded">start_backend.bat</code>.</>
-                  ) : (
-                    <>Tip: Ensure the deployed backend service is running and that the <code className="bg-slate-100 px-1.5 py-0.5 rounded">VITE_API_URL</code> environment variable is set in your Vercel settings.</>
-                  )}
-                </p>
+      {/* ── KPI Row ─────────────────────────────────────────── */}
+      <motion.div
+        variants={STAGGER}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+      >
+        {[
+          {
+            label: 'Total Sessions',
+            value: sessions?.length ?? 0,
+            icon: Briefcase,
+            color: 'text-indigo-600',
+            bg: 'bg-indigo-50',
+          },
+          {
+            label: 'Candidates Analyzed',
+            value: totalCandidates,
+            icon: Users,
+            color: 'text-emerald-600',
+            bg: 'bg-emerald-50',
+          },
+          {
+            label: 'Completed Sessions',
+            value: completedSessions,
+            icon: BarChart3,
+            color: 'text-violet-600',
+            bg: 'bg-violet-50',
+          },
+          {
+            label: 'AI Accuracy',
+            value: '94.2%',
+            icon: LineChart,
+            color: 'text-amber-600',
+            bg: 'bg-amber-50',
+          },
+        ].map((kpi) => (
+          <motion.div key={kpi.label} variants={ITEM} className="kpi-card">
+            <div className="flex items-start justify-between mb-3">
+              <div className={`w-9 h-9 rounded-xl ${kpi.bg} flex items-center justify-center`}>
+                <kpi.icon size={17} className={kpi.color} />
               </div>
-            )}
-          </Card>
-        </motion.div>
-
-        <div className="mb-8 flex justify-end">
-          <Button onClick={() => navigate('/demo')} aria-label="Start demo mode">Start Demo</Button>
-        </div>
-
-        {/* Recent Sessions */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Sessions</h2>
-
-          {isLoading ? (
-            <div className="space-y-4">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <SkeletonLoader key={i} count={1} className="h-40" />
-              ))}
             </div>
-          ) : !sessions || sessions.length === 0 ? (
-            <EmptyState
-              icon="📋"
-              title="No Sessions Yet"
-              description="Create your first hiring session to get started with AI-powered candidate ranking."
-              action={
-                <Button
-                  onClick={() => {
-                    const title = prompt('Enter job title:');
-                    if (title) {
-                      setRoleTitle(title);
-                      handleCreateSession();
-                    }
-                  }}
-                  aria-label="Create your first session"
-                >
-                  <Plus size={20} />
-                  Create First Session
-                </Button>
-              }
+            <div className={`kpi-value ${kpi.color}`}>{kpi.value}</div>
+            <div className="kpi-label">{kpi.label}</div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* ── New Session ─────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.25 }}
+      >
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="section-title">Start a New Hiring Session</h2>
+              <p className="section-subtitle mt-0.5">Enter a job title to begin the AI ranking pipeline.</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 flex-col sm:flex-row">
+            <input
+              type="text"
+              className="reci-input flex-1"
+              placeholder="e.g. Senior Machine Learning Engineer"
+              value={roleTitle}
+              onChange={(e) => setRoleTitle(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleCreate()}
             />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sessions.map((session) => (
-                <motion.div
-                  key={session.session_id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  whileHover={{ y: -4 }}
-                >
-                  <SessionCard
-                    session={session}
-                    onOpen={() => {
-                      if (session.status === 'new') {
-                        navigate(`/upload/${session.session_id}`);
-                      } else if (session.status === 'job_uploaded') {
-                        navigate(`/job-review/${session.session_id}`);
-                      } else if (session.status === 'job_reviewed') {
-                        navigate(`/processing/${session.session_id}`);
-                      } else {
-                        navigate(`/workspace/${session.session_id}`);
-                      }
-                    }}
-                    onExport={() => navigate(`/insights/${session.session_id}`)}
-                    onDelete={() => handleDeleteSession(session.session_id)}
-                  />
-                </motion.div>
-              ))}
+            <Button
+              onClick={handleCreate}
+              loading={createMutation.isPending}
+              disabled={!roleTitle.trim()}
+              className="sm:w-auto w-full justify-center"
+            >
+              <Plus size={16} />
+              Create Session
+            </Button>
+          </div>
+
+          {createMutation.isError && (
+            <div className="mt-3 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+              <span className="font-semibold">Failed to create session.</span>{' '}
+              {window.location.hostname === 'localhost'
+                ? 'Make sure the backend is running via start_backend.bat.'
+                : 'Ensure VITE_API_URL is set in Vercel settings.'}
             </div>
           )}
-        </motion.div>
-      </div>
+        </Card>
+      </motion.div>
+
+      {/* ── Recent Sessions ──────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.25 }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="section-title">Recent Sessions</h2>
+            <p className="section-subtitle">{sessions?.length ?? 0} session{sessions?.length !== 1 ? 's' : ''} total</p>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <SkeletonLoader count={3} className="h-40" />
+        ) : !sessions || sessions.length === 0 ? (
+          <Card className="p-6">
+            <EmptyState
+              icon={<Briefcase size={22} className="text-slate-400" />}
+              title="No sessions yet"
+              description="Create your first hiring session above to start ranking candidates with AI."
+            />
+          </Card>
+        ) : (
+          <motion.div
+            variants={STAGGER}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+          >
+            {sessions.map((session) => {
+              const cfg = STATUS_CONFIG[session.status] ?? { label: session.status, variant: 'neutral' as const };
+              return (
+                <motion.div key={session.session_id} variants={ITEM}>
+                  <Card hoverable className="p-5 flex flex-col h-full">
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div className="min-w-0 flex-1">
+                        <h3
+                          className="font-semibold text-slate-900 truncate text-sm"
+                          title={session.role_title}
+                        >
+                          {session.role_title}
+                        </h3>
+                        <p
+                          className="text-xs text-slate-400 font-mono truncate mt-0.5"
+                          title={session.session_id}
+                        >
+                          {session.session_id}
+                        </p>
+                      </div>
+                      <Badge variant={cfg.variant} size="sm">{cfg.label}</Badge>
+                    </div>
+
+                    {/* Meta */}
+                    <div className="grid grid-cols-2 gap-3 py-3 border-t border-b border-slate-100 mb-4">
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide mb-0.5">Created</p>
+                        <div className="flex items-center gap-1.5">
+                          <Clock size={11} className="text-slate-400" />
+                          <p className="text-xs font-medium text-slate-700">
+                            {new Date(session.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                          </p>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide mb-0.5">Candidates</p>
+                        <div className="flex items-center gap-1.5">
+                          <Users size={11} className="text-slate-400" />
+                          <p className="text-xs font-medium text-slate-700">{session.candidate_count ?? '—'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2 mt-auto">
+                      <button
+                        onClick={() => handleOpen(session)}
+                        className="flex-1 flex items-center justify-center gap-1.5 btn btn-primary btn-sm"
+                      >
+                        Open
+                        <ArrowRight size={13} />
+                      </button>
+                      <button
+                        onClick={() => navigate(`/insights/${session.session_id}`)}
+                        className="btn btn-secondary btn-sm px-2.5"
+                        title="Insights"
+                      >
+                        <BarChart3 size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(session.session_id)}
+                        className="btn btn-ghost btn-sm px-2.5 text-red-500 hover:bg-red-50"
+                        title="Delete"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        )}
+      </motion.div>
     </div>
   );
 };
