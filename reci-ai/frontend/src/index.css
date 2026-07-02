@@ -152,7 +152,7 @@
   font-size: 0.625rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #475569;
+  color: #64748B;
   margin-top: 2px;
   font-weight: 500;
 }
@@ -174,7 +174,7 @@
   border-radius: 10px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #64748B;
+  color: #94A3B8;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
@@ -183,7 +183,7 @@
 
 .sidebar-item:hover {
   background: #1E293B;
-  color: #CBD5E1;
+  color: #E2E8F0;
 }
 
 .sidebar-item.active {
@@ -200,12 +200,12 @@
   width: 17px;
   height: 17px;
   flex-shrink: 0;
-  color: #64748B;
+  color: #94A3B8;
   transition: color 0.2s;
 }
 
 .sidebar-item:hover svg {
-  color: #CBD5E1;
+  color: #E2E8F0;
 }
 
 .sidebar-section-label {
@@ -213,7 +213,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 600;
-  color: #334155;
+  color: #475569;
   padding: 0.75rem 0.875rem 0.25rem;
 }
 

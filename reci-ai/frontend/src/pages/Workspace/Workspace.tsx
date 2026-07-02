@@ -11,12 +11,12 @@ import { Search, Download, GitCompare, SlidersHorizontal } from 'lucide-react';
 const STAGGER = {
   hidden: {},
   show: { transition: { staggerChildren: 0.04 } },
-};
+} as const;
 
 const CARD_ITEM = {
   hidden: { opacity: 0, y: 16 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } },
-};
+  show:   { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' as const } },
+} as const;
 
 export const WorkspacePage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();

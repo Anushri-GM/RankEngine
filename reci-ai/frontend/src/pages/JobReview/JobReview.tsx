@@ -4,12 +4,11 @@ import { motion } from 'framer-motion';
 import { useJobUnderstanding, useUpdateJobUnderstanding, useConfirmJobUnderstanding } from '../../hooks/api/jobs';
 import { Card, Button, Spinner } from '../../components/common';
 import { SkillChip } from '../../components/panels/ScorePanel';
-import { Edit2 } from 'lucide-react';
+import { CheckCircle, Edit2 } from 'lucide-react';
 
 export const JobReviewPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
-  useSession(sessionId);
   const { data: jobUnderstanding, isLoading: jobLoading } = useJobUnderstanding(sessionId);
   const updateJobMutation = useUpdateJobUnderstanding();
   const confirmJobMutation = useConfirmJobUnderstanding();

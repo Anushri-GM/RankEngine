@@ -113,7 +113,7 @@ export const UploadPage: React.FC = () => {
                 onDragEnter={handleDragEnter}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, 'job')}
-                className="text-center py-6"
+                className={`text-center py-6 rounded-xl transition-colors ${dragActive ? 'bg-indigo-50/50 border border-indigo-200' : ''}`}
               >
                 <p className="text-sm text-slate-500 mb-3">
                   Drag & drop your job description (DOCX or JSON)
@@ -191,7 +191,7 @@ export const UploadPage: React.FC = () => {
                 onDragEnter={handleDragEnter}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, 'candidate')}
-                className="text-center py-6"
+                className={`text-center py-6 rounded-xl transition-colors ${dragActive ? 'bg-emerald-50/50 border border-emerald-200' : ''}`}
               >
                 <p className="text-sm text-slate-500 mb-3">
                   Drag & drop candidate data (CSV, JSON, or XLSX)
