@@ -23,10 +23,10 @@ class ModelLoader:
             try:
                 import spacy
                 try:
-                    self._spacy = spacy.load("en_core_web_lg")
+                    self._spacy = spacy.load("en_core_web_sm")
                 except Exception:
-                    spacy.cli.download("en_core_web_lg")
-                    self._spacy = spacy.load("en_core_web_lg")
+                    spacy.cli.download("en_core_web_sm")
+                    self._spacy = spacy.load("en_core_web_sm")
             except Exception:
                 self._spacy = None
         return self._spacy
