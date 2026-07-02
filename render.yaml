@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: reci-backend
+    env: python
+    region: oregon
+    plan: free
+    rootDir: reci-ai/backend
+    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm && python build_setup.py
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: OUTPUT_PATH
+        value: /tmp/reci-outputs
+      - key: MODEL_CACHE
+        value: /tmp/reci-cache
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: DEMO_MODE
+        value: "true"
+      - key: ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: SESSION_TIMEOUT_SECONDS
+        value: "86400"
+      - key: MAX_UPLOAD_SIZE_BYTES
+        value: "10000000"
