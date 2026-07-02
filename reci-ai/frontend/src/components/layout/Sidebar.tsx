@@ -18,7 +18,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   ];
 
   const activeStyle = 'bg-primary text-white shadow-md shadow-primary/20';
-  const inactiveStyle = 'text-slate-600 hover:bg-slate-50 hover:text-slate-900';
 
   return (
     <>
