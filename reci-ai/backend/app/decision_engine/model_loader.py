@@ -32,6 +32,8 @@ class ModelLoader:
         return self._spacy
 
     def get_embedding_model(self):
+        if settings.LIGHTWEIGHT_MODE:
+            return None
         if self._embedding is None:
             try:
                 from sentence_transformers import SentenceTransformer
@@ -44,6 +46,8 @@ class ModelLoader:
         return self._embedding
 
     def get_cross_encoder(self):
+        if settings.LIGHTWEIGHT_MODE:
+            return None
         if self._cross_encoder is None:
             try:
                 from sentence_transformers import CrossEncoder

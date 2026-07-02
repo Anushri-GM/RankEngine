@@ -16,9 +16,21 @@ class DecisionEngine:
     def __init__(self):
         self.outputs = Path(settings.OUTPUT_PATH)
         self.cache = Path(settings.MODEL_CACHE)
-        self.embedding = EmbeddingEngine()
+        self._embedding = None
         self.index = FaissIndex()
-        self.reranker = CrossEncoderRanker()
+        self._reranker = None
+
+    @property
+    def embedding(self) -> EmbeddingEngine:
+        if self._embedding is None:
+            self._embedding = EmbeddingEngine()
+        return self._embedding
+
+    @property
+    def reranker(self) -> CrossEncoderRanker:
+        if self._reranker is None:
+            self._reranker = CrossEncoderRanker()
+        return self._reranker
 
     def pre_run_validate_outputs(self) -> None:
         required = [

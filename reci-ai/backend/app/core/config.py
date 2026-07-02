@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     ALLOWED_CANDIDATE_EXTENSIONS: tuple[str, ...] = (".json",)
     CORS_ORIGINS: str = Field(default="*")
     DEMO_MODE: bool = Field(default=True)
+    LIGHTWEIGHT_MODE: bool = Field(default=True)
     LOG_LEVEL: str = Field(default="INFO")
 
 
