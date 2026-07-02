@@ -131,6 +131,31 @@ class Loader:
         else:
             candidate["activity_metadata"] = {}
             
+        # 10. experience_years
+        import re
+        exp_years = 0.0
+        for k in ["experienceyears", "years", "exp"]:
+            if k in norm_row:
+                val = norm_row[k]
+                try:
+                    match = re.search(r'([\d\.]+)', str(val))
+                    if match:
+                        exp_years = float(match.group(1))
+                        break
+                except Exception:
+                    pass
+        else:
+            if "experience" in norm_row:
+                val_str = str(norm_row["experience"]).strip()
+                if re.match(r'^[\d\.]+(?:\s*(?:years|yr|years\s*exp|yrs|year))?$', val_str, re.IGNORECASE):
+                    try:
+                        match = re.search(r'([\d\.]+)', val_str)
+                        if match:
+                            exp_years = float(match.group(1))
+                    except Exception:
+                        pass
+        candidate["experience_years"] = exp_years
+            
         return candidate
 
     @staticmethod

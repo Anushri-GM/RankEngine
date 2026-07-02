@@ -100,7 +100,9 @@ class CandidateUnderstandingEngine:
             
             work_history = raw_candidate.get("work_history", [])
             timeline = ExperienceEngine.analyze_timeline(work_history)
-            experience_years = round(timeline.total_months / 12, 1)
+            experience_years = float(raw_candidate.get("experience_years", 0.0) or 0.0)
+            if not experience_years or experience_years == 0.0:
+                experience_years = round(timeline.total_months / 12, 1)
 
             projects_raw = raw_candidate.get("projects", [])
             projects = ProjectEngine.parse_projects(projects_raw)
