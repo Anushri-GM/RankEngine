@@ -2,10 +2,9 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useJobUnderstanding, useUpdateJobUnderstanding, useConfirmJobUnderstanding } from '../../hooks/api/jobs';
-import { useSession } from '../../hooks/api/sessions';
 import { Card, Button, Spinner } from '../../components/common';
 import { SkillChip } from '../../components/panels/ScorePanel';
-import { CheckCircle, Edit2 } from 'lucide-react';
+import { Edit2 } from 'lucide-react';
 
 export const JobReviewPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();

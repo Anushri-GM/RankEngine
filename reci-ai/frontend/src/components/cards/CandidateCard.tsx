@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import type { CandidateProfile } from '../../types';
 import { Card, Badge } from '../common';
 import { formatScore, getRecommendationLabel } from '../../utils/formatters';
