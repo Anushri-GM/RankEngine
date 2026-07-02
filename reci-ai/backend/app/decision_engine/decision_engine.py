@@ -37,21 +37,37 @@ class DecisionEngine:
                 missing.append(name)
 
         if missing:
-            # attempt auto-generation via ParserMetadataEngine
-            dataset_path, _ = ParserMetadataEngine.discover_candidate_dataset()
+            dataset_path, _ = ParserMetadataEngine.discover_candidate_dataset(base_dir=self.outputs.parent)
             dataset_path_obj = Path(dataset_path) if dataset_path else None
             if dataset_path_obj and dataset_path_obj.exists():
                 raw = ParserMetadataEngine.load_candidates_from_path(dataset_path_obj)
-                # perform existing flows to create artifacts
-                # create minimal processed candidates and behavior profiles
-                from app.understanding.candidate_understanding import CandidateUnderstandingEngine
-                from app.understanding.behavior_understanding import BehaviorUnderstanding
-                from app.understanding.validation_engine import ValidationEngine
+                if raw:
+                    from app.understanding.candidate_understanding import CandidateUnderstandingEngine
+                    from app.understanding.behavior_understanding import BehaviorUnderstanding
+                    from app.understanding.validation_engine import ValidationEngine
 
-                validation_report = ValidationEngine.validate_candidate_dataset(raw)
-                processed = [CandidateUnderstandingEngine.process_candidate(c) for c in raw]
-                behaviors = [BehaviorUnderstanding.generate_profile(p, validation_report.status) for p in processed]
-                ParserMetadataEngine.generate_artifacts(raw, processed, behaviors, validation_report, dataset_path_obj, self.outputs)
+                    validation_report = ValidationEngine.validate_candidate_dataset(raw)
+                    processed = [CandidateUnderstandingEngine.process_candidate(c) for c in raw]
+                    behaviors = [BehaviorUnderstanding.generate_profile(p, validation_report.status) for p in processed]
+                    ParserMetadataEngine.generate_artifacts(raw, processed, behaviors, validation_report, dataset_path_obj, self.outputs)
+
+                    enhanced_candidates = []
+                    for idx, (candidate, profile) in enumerate(zip(processed, behaviors)):
+                        enhanced_candidates.append(
+                            ParserMetadataEngine.enrich_candidate_payload(
+                                candidate=candidate,
+                                behavior_profile=profile,
+                                validation_status=validation_report.status,
+                                profile_completeness=profile.profile_completeness_score,
+                                index=idx,
+                            )
+                        )
+
+                    with open(self.outputs / "candidate_intelligence.json", "w", encoding="utf-8") as handle:
+                        json.dump(enhanced_candidates, handle, indent=2)
+
+                    with open(self.outputs / "behavior_profiles.json", "w", encoding="utf-8") as handle:
+                        json.dump([profile.model_dump() for profile in behaviors], handle, indent=2)
 
     def prepare_embeddings_and_index(self) -> None:
         # Load candidate intelligence

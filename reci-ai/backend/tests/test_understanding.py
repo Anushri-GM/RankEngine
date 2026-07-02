@@ -1,4 +1,5 @@
 import io
+import json
 import docx
 import pytest
 from app.understanding.job_understanding import JobUnderstandingEngine
@@ -9,6 +10,8 @@ from app.understanding.normalization_engine import NormalizationEngine
 from app.understanding.skill_taxonomy import taxonomy
 from app.understanding.loader import Loader
 from app.understanding.parser_metadata import ParserMetadataEngine
+from app.decision_engine.decision_engine import DecisionEngine
+from app.core.config import settings
 
 def create_mock_docx() -> bytes:
     """
@@ -153,3 +156,41 @@ def test_parser_metadata_generation(tmp_path):
     assert skill_taxonomy[0]["canonical_name"] in {"Python", "JavaScript", "React"}
     assert role_taxonomy[0]["role_category"]
     assert dataset_statistics["candidate_count"] == len(candidates)
+
+
+def test_discover_candidate_dataset_from_parent_workspace(tmp_path):
+    project_root = tmp_path / "reci-ai"
+    project_root.mkdir()
+
+    dataset_path = tmp_path / "Dataset" / "[PUB] India_runs_data_and_ai_challenge" / "India_runs_data_and_ai_challenge" / "sample_candidates.json"
+    dataset_path.parent.mkdir(parents=True, exist_ok=True)
+    dataset_path.write_text(json.dumps([{"candidate_id": "cand-1", "name": "Test Candidate", "skills": ["Python"]}]), encoding="utf-8")
+
+    discovered_path, discovered_paths = ParserMetadataEngine.discover_candidate_dataset(base_dir=project_root)
+
+    assert discovered_path == dataset_path.resolve()
+    assert dataset_path.resolve() in discovered_paths
+
+
+def test_pre_run_validate_outputs_generates_candidate_intelligence(tmp_path, monkeypatch):
+    outputs_dir = tmp_path / "outputs"
+    cache_dir = tmp_path / "cache"
+    outputs_dir.mkdir(parents=True, exist_ok=True)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    monkeypatch.setattr(settings, "OUTPUT_PATH", str(outputs_dir))
+    monkeypatch.setattr(settings, "MODEL_CACHE", str(cache_dir))
+
+    dataset_path = tmp_path / "Dataset" / "sample_candidates.json"
+    dataset_path.parent.mkdir(parents=True, exist_ok=True)
+    dataset_path.write_text(json.dumps([{"candidate_id": "cand-1", "name": "Test Candidate", "skills": ["Python"]}]), encoding="utf-8")
+
+    engine = DecisionEngine()
+    engine.pre_run_validate_outputs()
+
+    candidate_path = outputs_dir / "candidate_intelligence.json"
+    assert candidate_path.exists()
+
+    payload = json.loads(candidate_path.read_text(encoding="utf-8"))
+    assert len(payload) == 1
+    assert payload[0]["candidate_id"] == "cand-1"

@@ -19,30 +19,40 @@ class ParserMetadataEngine:
             if override.exists():
                 return override.resolve(), [override.resolve()]
 
-        search_roots = ["datasets", "input", "resources", "uploads", "data"]
+        search_roots = ["datasets", "input", "resources", "uploads", "data", "Dataset", "extracted_data", "outputs"]
         candidate_files: List[Path] = []
 
-        for root_name in search_roots:
-            root_dir = workspace_root / root_name
+        def collect_from_dir(root_dir: Path) -> None:
             if not root_dir.exists():
-                continue
+                return
             for path in root_dir.rglob("*"):
                 if not path.is_file():
                     continue
                 if path.suffix.lower() in {".json", ".jsonl", ".csv"} and ParserMetadataEngine._looks_like_candidate_dataset(path):
                     candidate_files.append(path.resolve())
 
+        for root_name in search_roots:
+            collect_from_dir(workspace_root / root_name)
+
         if not candidate_files:
-            for path in workspace_root.rglob("*"):
-                if not path.is_file():
-                    continue
-                if path.suffix.lower() in {".json", ".jsonl", ".csv"} and ParserMetadataEngine._looks_like_candidate_dataset(path):
-                    candidate_files.append(path.resolve())
+            collect_from_dir(workspace_root)
+
+        if not candidate_files:
+            for candidate_dir in [workspace_root.parent, workspace_root.parent / "Dataset", workspace_root.parent / "extracted_data"]:
+                collect_from_dir(candidate_dir)
 
         if not candidate_files:
             return workspace_root / "data" / "candidates.json", []
 
-        candidate_files = sorted(candidate_files, key=lambda p: p.stat().st_size, reverse=True)
+        candidate_files = sorted(
+            candidate_files,
+            key=lambda p: (
+                ParserMetadataEngine._candidate_dataset_priority(p),
+                p.stat().st_size,
+                len(p.parts),
+            ),
+            reverse=True,
+        )
         return candidate_files[0], candidate_files
 
     @staticmethod
@@ -144,11 +154,11 @@ class ParserMetadataEngine:
                 with open(path, "r", encoding="utf-8") as handle:
                     content = json.load(handle)
                 if isinstance(content, list):
-                    return any(isinstance(item, dict) for item in content)
+                    return any(ParserMetadataEngine._looks_like_candidate_record(item) for item in content if isinstance(item, dict))
                 if isinstance(content, dict):
                     if isinstance(content.get("candidates"), list):
-                        return True
-                    return any(key in content for key in ["candidate_id", "name", "skills", "profile"])
+                        return any(ParserMetadataEngine._looks_like_candidate_record(item) for item in content["candidates"] if isinstance(item, dict))
+                    return ParserMetadataEngine._looks_like_candidate_record(content)
             except Exception:
                 return False
 
@@ -161,8 +171,8 @@ class ParserMetadataEngine:
                         if not line.strip():
                             continue
                         item = json.loads(line)
-                        if isinstance(item, dict):
-                            return any(key in item for key in ["candidate_id", "name", "skills", "profile"])
+                        if isinstance(item, dict) and ParserMetadataEngine._looks_like_candidate_record(item):
+                            return True
             except Exception:
                 return False
 
@@ -175,6 +185,37 @@ class ParserMetadataEngine:
                 return False
 
         return False
+
+    @staticmethod
+    def _looks_like_candidate_record(item: Dict[str, Any]) -> bool:
+        if not isinstance(item, dict):
+            return False
+
+        if item.get("candidate_id") or item.get("id"):
+            return True
+
+        profile = item.get("profile")
+        if isinstance(profile, dict):
+            if any(key in profile for key in ["anonymized_name", "headline", "summary", "current_title", "candidate_id", "id"]):
+                return True
+
+        if isinstance(item.get("skills"), list) and item.get("skills"):
+            if isinstance(item.get("education"), list) or isinstance(item.get("work_history"), list) or isinstance(item.get("career_history"), list) or isinstance(item.get("projects"), list):
+                return True
+
+        return any(key in item for key in ["work_history", "career_history", "education", "certifications", "languages", "projects", "redrob_signals"])
+
+    @staticmethod
+    def _candidate_dataset_priority(path: Path) -> int:
+        name = path.name.lower()
+        score = 0
+        if any(token in name for token in ["candidate", "sample"]):
+            score += 50
+        if any(token in str(path.parent).lower() for token in ["dataset", "extracted", "uploads", "data", "resource"]):
+            score += 20
+        if path.suffix.lower() == ".json":
+            score += 5
+        return score
 
     @staticmethod
     def _build_manifest(candidates: List[Dict[str, Any]], validation_report: ValidationReport, dataset_path: Optional[Path], output_dir: Path, session_id: Optional[str] = None) -> Dict[str, Any]:

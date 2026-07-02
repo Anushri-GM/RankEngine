@@ -14,7 +14,17 @@ class CandidateUnderstandingEngine:
         Transforms raw candidate data into structured CandidateIntelligence object.
         Supports both simplified format and the official Redrob Challenge dataset schema.
         """
-        candidate_id = str(raw_candidate.get("candidate_id", "Unknown ID"))
+        candidate_id = None
+        if raw_candidate.get("candidate_id"):
+            candidate_id = str(raw_candidate.get("candidate_id"))
+        elif raw_candidate.get("profile", {}).get("candidate_id"):
+            candidate_id = str(raw_candidate.get("profile", {}).get("candidate_id"))
+        elif raw_candidate.get("profile", {}).get("id"):
+            candidate_id = str(raw_candidate.get("profile", {}).get("id"))
+        elif raw_candidate.get("id"):
+            candidate_id = str(raw_candidate.get("id"))
+        else:
+            candidate_id = "Unknown ID"
 
         # Check if official Redrob dataset format (has nested profile object)
         if "profile" in raw_candidate and isinstance(raw_candidate["profile"], dict):
