@@ -26,7 +26,7 @@ export const Settings: React.FC = () => {
                 value={import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 font-mono"
               />
-              <p className="mt-1 text-[10px] text-slate-400">
+              <p className="mt-1 text-[10px] text-slate-500">
                 Loaded dynamically from frontend VITE_API_URL environment configuration.
               </p>
             </div>
@@ -47,7 +47,7 @@ export const Settings: React.FC = () => {
                   type="text"
                   disabled
                   value="/app/cache"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 font-mono"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-600 font-mono"
                 />
               </div>
               <div>
@@ -56,11 +56,11 @@ export const Settings: React.FC = () => {
                   type="text"
                   disabled
                   value="/app/outputs"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 font-mono"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-600 font-mono"
                 />
               </div>
             </div>
-            <p className="text-[10px] text-slate-400 mt-2">
+            <p className="text-[10px] text-slate-500 mt-2">
               Determined by backend config.py using MODEL_CACHE and OUTPUT_PATH keys.
             </p>
           </div>
@@ -76,14 +76,14 @@ export const Settings: React.FC = () => {
             <div className="flex items-center justify-between py-2 border-b border-slate-50">
               <div>
                 <p className="font-semibold text-slate-700">Anonymize Candidate PII</p>
-                <p className="text-[10px] text-slate-400">Mask names and contact details during AI vector mapping.</p>
+                <p className="text-[10px] text-slate-500">Mask names and contact details during AI vector mapping.</p>
               </div>
               <input type="checkbox" defaultChecked className="h-4 w-4 text-primary rounded border-slate-300 focus:ring-primary" />
             </div>
             <div className="flex items-center justify-between py-2 border-b border-slate-50">
               <div>
                 <p className="font-semibold text-slate-700">Detailed Explanations</p>
-                <p className="text-[10px] text-slate-400">Generate structured natural language justifications for scores.</p>
+                <p className="text-[10px] text-slate-500">Generate structured natural language justifications for scores.</p>
               </div>
               <input type="checkbox" defaultChecked className="h-4 w-4 text-primary rounded border-slate-300 focus:ring-primary" />
             </div>

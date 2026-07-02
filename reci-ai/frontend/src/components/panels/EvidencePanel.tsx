@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Evidence, DecisionStep } from '../../types';
+import type { Evidence, DecisionStep } from '../../types';
 import { formatDuration } from '../../utils/formatters';
 import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
 
@@ -15,7 +15,7 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({ evidence = [], cla
       <h3 className="text-lg font-semibold text-gray-900">Evidence</h3>
 
       {evidence.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-slate-500">
           <p>No evidence available</p>
         </div>
       ) : (
@@ -27,7 +27,7 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({ evidence = [], cla
             transition={{ delay: sectionIdx * 0.1 }}
             className="border border-gray-200 rounded-lg p-4"
           >
-            <h4 className="font-semibold text-gray-900 mb-3">{section.category}</h4>
+            <h4 className="font-semibold text-slate-900 mb-3">{section.category}</h4>
 
             <div className="space-y-3">
               {section.items.map((item, itemIdx) => (
@@ -130,16 +130,16 @@ export const DecisionTimeline: React.FC<DecisionTimelineProps> = ({ steps, class
               </div>
 
               {step.details && (
-                <p className="text-sm text-gray-700 mt-1">{step.details}</p>
+                <p className="text-sm text-slate-700 mt-1">{step.details}</p>
               )}
 
               {step.output_count !== undefined && (
-                <p className="text-xs text-gray-600 mt-2">
+                <p className="text-xs text-slate-600 mt-2">
                   Output: {step.output_count} items
                 </p>
               )}
 
-              <div className="text-xs text-gray-500 mt-2 capitalize">
+              <div className="text-xs text-slate-500 mt-2 capitalize">
                 {step.status}
               </div>
             </div>

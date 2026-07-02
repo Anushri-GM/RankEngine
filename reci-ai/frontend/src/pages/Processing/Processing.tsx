@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSessionProcessingStatus, useSession } from '../../hooks/api/sessions';
 import { useRankCandidates } from '../../hooks/api/candidates';
-import { Card, Spinner } from '../../components/common';
+import { Card } from '../../components/common';
 import { ProcessingProgress } from '../../components/panels/EvidencePanel';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 

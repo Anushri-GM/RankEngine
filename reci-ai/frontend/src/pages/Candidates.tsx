@@ -83,7 +83,7 @@ export const Candidates: React.FC = () => {
       <Card className="p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
             <input
               type="text"
               placeholder="Search by name, role, or skills..."
@@ -94,11 +94,11 @@ export const Candidates: React.FC = () => {
           </div>
           <div className="flex items-center space-x-3 w-full md:w-auto">
             <Button variant="outline" size="sm" className="w-full md:w-auto">
-              <SlidersHorizontal className="h-4 w-4 mr-2 text-slate-500" />
+              <SlidersHorizontal className="h-4 w-4 mr-2 text-slate-600" />
               Filters
             </Button>
             <Button variant="outline" size="sm" className="w-full md:w-auto">
-              <ArrowUpDown className="h-4 w-4 mr-2 text-slate-500" />
+              <ArrowUpDown className="h-4 w-4 mr-2 text-slate-600" />
               Sort
             </Button>
           </div>
@@ -125,7 +125,7 @@ export const Candidates: React.FC = () => {
                   <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-semibold text-slate-800">{c.name}</div>
-                      <div className="text-xs text-slate-400 mt-0.5">{c.experience} exp</div>
+                      <div className="text-xs text-slate-500 mt-0.5">{c.experience} exp</div>
                     </td>
                     <td className="px-6 py-4 font-medium text-slate-700">{c.role}</td>
                     <td className="px-6 py-4">
@@ -161,8 +161,8 @@ export const Candidates: React.FC = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center p-12 text-center">
-            <p className="text-sm font-semibold text-slate-500">No candidates match your query.</p>
-            <p className="text-xs text-slate-400 mt-1">Try resetting your search query or filters.</p>
+            <p className="text-sm font-semibold text-slate-600">No candidates match your query.</p>
+            <p className="text-xs text-slate-500 mt-1">Try resetting your search query or filters.</p>
           </div>
         )}
       </Card>

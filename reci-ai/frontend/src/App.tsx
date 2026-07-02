@@ -11,10 +11,10 @@ import WorkspacePage from './pages/Workspace/Workspace';
 import CandidateDetailPage from './pages/CandidateDetail/CandidateDetail';
 import ComparePage from './pages/Compare/Compare';
 import InsightsPage from './pages/Insights/Insights';
+import DemoPage from './pages/DemoPage';
 import { NotFound } from './pages/NotFound';
 
 // Layout
-import { Layout } from './components/layout/Layout';
 
 // Initialize React Query Client
 const queryClient = new QueryClient({
@@ -41,6 +41,7 @@ export const App: React.FC = () => {
           <Route path="/candidate/:sessionId/:candidateId" element={<CandidateDetailPage />} />
           <Route path="/compare/:sessionId/:candidateId1/:candidateId2" element={<ComparePage />} />
           <Route path="/insights/:sessionId" element={<InsightsPage />} />
+          <Route path="/demo" element={<DemoPage />} />
 
           {/* Legacy Routes - Redirect to home */}
           <Route path="/parser" element={<HomePage />} />

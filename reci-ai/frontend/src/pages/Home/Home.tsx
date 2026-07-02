@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSessions, useCreateSession } from '../../hooks/api/sessions';
-import { Button, Card, EmptyState, Spinner, SkeletonLoader } from '../../components/common';
+import { Button, Card, EmptyState, SkeletonLoader } from '../../components/common';
 import { SessionCard } from '../../components/cards/CandidateCard';
 import { Plus, FileText, BarChart3 } from 'lucide-react';
 
@@ -89,6 +89,7 @@ export const HomePage: React.FC = () => {
                 onClick={handleCreateSession}
                 loading={createSessionMutation.isPending}
                 className="inline-flex items-center gap-2"
+                aria-label="Create a new hiring session"
               >
                 <Plus size={20} />
                 Create Session
@@ -100,6 +101,10 @@ export const HomePage: React.FC = () => {
             )}
           </Card>
         </motion.div>
+
+        <div className="mb-8 flex justify-end">
+          <Button onClick={() => navigate('/demo')} aria-label="Start demo mode">Start Demo</Button>
+        </div>
 
         {/* Recent Sessions */}
         <motion.div
@@ -129,6 +134,7 @@ export const HomePage: React.FC = () => {
                       handleCreateSession();
                     }
                   }}
+                  aria-label="Create your first session"
                 >
                   <Plus size={20} />
                   Create First Session

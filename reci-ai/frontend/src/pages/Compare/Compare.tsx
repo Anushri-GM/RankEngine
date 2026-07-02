@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCandidateDetail, useCompareCandidates } from '../../hooks/api/candidates';
-import { Card, Button, Spinner } from '../../components/common';
+import { Card, Spinner } from '../../components/common';
 import { FitScore } from '../../components/panels/ScorePanel';
 import { formatScore } from '../../utils/formatters';
 import { ChevronLeft, ArrowUp, ArrowDown } from 'lucide-react';
@@ -17,7 +17,7 @@ export const ComparePage: React.FC = () => {
 
   const { data: candidate1, isLoading: loading1 } = useCandidateDetail(sessionId, candidateId1);
   const { data: candidate2, isLoading: loading2 } = useCandidateDetail(sessionId, candidateId2);
-  const { data: comparison } = useCompareCandidates(sessionId, candidateId1, candidateId2);
+  useCompareCandidates(sessionId, candidateId1, candidateId2);
 
   if (loading1 || loading2 || !candidate1 || !candidate2) {
     return (

@@ -1,8 +1,9 @@
 import hashlib
+import io
 import json
-import os
 import shutil
 import time
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -10,6 +11,7 @@ from uuid import uuid4
 from zipfile import BadZipFile
 
 from app.core.config import settings
+from app.core.logging_config import app_logger
 from app.understanding.behavior_understanding import BehaviorUnderstanding
 from app.understanding.candidate_understanding import CandidateUnderstandingEngine
 from app.understanding.job_understanding import JobUnderstandingEngine
@@ -41,6 +43,7 @@ class UploadService:
             "uploads": {},
         }
         self._write_session_payload(session_id, payload)
+        app_logger.info("session_created", extra={"event": "session_create", "session_id": session_id})
         return payload
 
     def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
@@ -55,11 +58,19 @@ class UploadService:
         if not session:
             raise ValueError("Unknown upload session")
 
-        suffix = Path(file_name).suffix.lower()
-        allowed = {"job": {".docx"}, "candidates": {".json"}}
+        safe_name = self._validate_filename(file_name)
+        self._validate_upload_size(file_bytes)
+
+        suffix = Path(safe_name).suffix.lower()
+        allowed = {"job": set(settings.ALLOWED_JOB_EXTENSIONS), "candidates": set(settings.ALLOWED_CANDIDATE_EXTENSIONS)}
         if kind not in allowed or suffix not in allowed[kind]:
             supported = ", ".join(sorted(allowed[kind]))
             raise ValueError(f"Unsupported file type for {kind}. Supported types: {supported}")
+
+        if kind == "job":
+            self._validate_docx_bytes(file_bytes)
+        else:
+            self._validate_json_bytes(file_bytes)
 
         session_dir = Path(session["upload_dir"])
         target_name = "job_description.docx" if kind == "job" else "candidates.json"
@@ -67,7 +78,7 @@ class UploadService:
         target_path.write_bytes(file_bytes)
 
         session["uploads"][kind] = {
-            "file_name": Path(file_name).name,
+            "file_name": Path(safe_name).name,
             "stored_path": str(target_path),
             "uploaded_at": datetime.now(timezone.utc).isoformat(),
             "size_bytes": len(file_bytes),
@@ -76,6 +87,7 @@ class UploadService:
         session["status"] = "ready" if set(session["uploads"].keys()) == {"job", "candidates"} else "uploaded"
         session["updated_at"] = datetime.now(timezone.utc).isoformat()
         self._write_session_payload(session_id, session)
+        app_logger.info("upload_saved", extra={"event": "upload", "session_id": session_id, "kind": kind, "size_bytes": len(file_bytes)})
         return session["uploads"][kind]
 
     def process_job_upload(self, session_id: str, file_name: str, file_bytes: bytes) -> Dict[str, Any]:
@@ -101,6 +113,7 @@ class UploadService:
         session["updated_at"] = datetime.now(timezone.utc).isoformat()
         session["job_parsed_at"] = datetime.now(timezone.utc).isoformat()
         self._write_session_payload(session_id, session)
+        app_logger.info("job_processed", extra={"event": "parser", "session_id": session_id})
 
         return {
             "ok": True,
@@ -125,6 +138,7 @@ class UploadService:
 
         validation_report = ValidationEngine.validate_candidate_dataset(raw_candidates)
         if validation_report.failures:
+            app_logger.warning("candidate_validation_failed", extra={"event": "validation", "session_id": session_id, "failures": len(validation_report.failures)})
             return {
                 "ok": False,
                 "error": "Candidate dataset failed validation",
@@ -181,6 +195,7 @@ class UploadService:
         session["updated_at"] = datetime.now(timezone.utc).isoformat()
         session["candidates_parsed_at"] = datetime.now(timezone.utc).isoformat()
         self._write_session_payload(session_id, session)
+        app_logger.info("candidates_processed", extra={"event": "parser", "session_id": session_id, "candidate_count": len(raw_candidates)})
 
         return {
             "ok": True,
@@ -203,6 +218,46 @@ class UploadService:
             session_file.unlink(missing_ok=True)
         return {"deleted": True, "session_id": session_id}
 
+    def _validate_filename(self, file_name: str) -> str:
+        if not file_name or not isinstance(file_name, str):
+            raise ValueError("Invalid filename")
+        candidate = Path(file_name).name
+        if candidate != file_name or "/" in file_name or "\\" in file_name or file_name.startswith("."):
+            raise ValueError("Invalid filename")
+        if any(char in file_name for char in ['..', '(', ')', ':', '*', '?', '"', '<', '>', '|']):
+            raise ValueError("Invalid filename")
+        return candidate
+
+    def _validate_upload_size(self, file_bytes: bytes) -> None:
+        if len(file_bytes) > settings.MAX_UPLOAD_SIZE_BYTES:
+            raise ValueError(f"Upload too large: maximum {settings.MAX_UPLOAD_SIZE_BYTES} bytes allowed")
+
+    def _validate_docx_bytes(self, file_bytes: bytes) -> None:
+        try:
+            with zipfile.ZipFile(Path("/tmp") if False else None):
+                pass
+        except Exception:
+            pass
+        try:
+            with zipfile.ZipFile(file_bytes if False else None):
+                pass
+        except Exception:
+            pass
+        try:
+            with zipfile.ZipFile(io.BytesIO(file_bytes)) as archive:
+                if "word/document.xml" not in archive.namelist():
+                    raise ValueError("Invalid DOCX package")
+        except Exception as exc:
+            raise ValueError("Invalid DOCX package") from exc
+
+    def _validate_json_bytes(self, file_bytes: bytes) -> None:
+        try:
+            payload = json.loads(file_bytes.decode("utf-8"))
+        except Exception as exc:
+            raise ValueError("Invalid JSON payload") from exc
+        if not isinstance(payload, list):
+            raise ValueError("Candidate dataset must be a JSON array")
+
     def _write_session_payload(self, session_id: str, payload: Dict[str, Any]) -> None:
         session_file = self.base_upload_dir / f"{session_id}.json"
         with open(session_file, "w", encoding="utf-8") as handle:
@@ -215,8 +270,9 @@ class UploadService:
         with open(session_file, "r", encoding="utf-8") as handle:
             return json.load(handle)
 
-    def _cleanup_expired_sessions(self, max_age_seconds: int = 86400) -> None:
+    def _cleanup_expired_sessions(self, max_age_seconds: Optional[int] = None) -> None:
         now = time.time()
+        max_age_seconds = max_age_seconds or settings.SESSION_TIMEOUT_SECONDS
         for session_file in self.base_upload_dir.glob("session_*.json"):
             try:
                 with open(session_file, "r", encoding="utf-8") as handle:

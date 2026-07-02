@@ -136,7 +136,7 @@ export const ParserDashboard: React.FC = () => {
         <Card hoverEffect={true}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Job Parsed Status</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Job Parsed Status</p>
               <h3 className="text-xl font-bold text-slate-800 mt-2">
                 {status?.job_description_parsed ? 'Parsed & Loaded' : 'Not Loaded'}
               </h3>
@@ -144,7 +144,7 @@ export const ParserDashboard: React.FC = () => {
             <div className={`h-10 w-10 rounded-lg flex items-center justify-center border ${
               status?.job_description_parsed 
                 ? 'bg-blue-50 border-blue-100 text-primary' 
-                : 'bg-slate-50 border-slate-100 text-slate-400'
+                : 'bg-slate-50 border-slate-100 text-slate-500'
             }`}>
               <FileText className="h-5 w-5" />
             </div>
@@ -161,7 +161,7 @@ export const ParserDashboard: React.FC = () => {
         <Card hoverEffect={true}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Candidates Ingested</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Candidates Ingested</p>
               <h3 className="text-xl font-bold text-slate-800 mt-2">
                 {status?.candidates_parsed || 0} Profiles
               </h3>
@@ -181,7 +181,7 @@ export const ParserDashboard: React.FC = () => {
         <Card hoverEffect={true}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Behaviors Resolved</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Behaviors Resolved</p>
               <h3 className="text-xl font-bold text-slate-800 mt-2">
                 {status?.behavior_profiles_generated || 0} Vectors
               </h3>
@@ -205,12 +205,12 @@ export const ParserDashboard: React.FC = () => {
           {/* Upload Job Description */}
           <Card>
             <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4 flex items-center">
-              <Upload className="h-4 w-4 mr-2 text-slate-400" />
+              <Upload className="h-4 w-4 mr-2 text-slate-500" />
               Upload Job Description (.docx)
             </h3>
             <form onSubmit={handleJobUpload} className="space-y-4">
               <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100/50 transition-colors">
-                <FileText className="h-8 w-8 text-slate-400 mb-2" />
+                <FileText className="h-8 w-8 text-slate-500 mb-2" />
                 <span className="text-xs font-semibold text-slate-600">Select Word Document</span>
                 <input
                   type="file"
@@ -235,12 +235,12 @@ export const ParserDashboard: React.FC = () => {
           {/* Upload Candidate Dataset */}
           <Card>
             <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4 flex items-center">
-              <Database className="h-4 w-4 mr-2 text-slate-400" />
+              <Database className="h-4 w-4 mr-2 text-slate-500" />
               Upload Candidate Dataset (.json)
             </h3>
             <form onSubmit={handleCandidatesUpload} className="space-y-4">
               <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100/50 transition-colors">
-                <FileText className="h-8 w-8 text-slate-400 mb-2" />
+                <FileText className="h-8 w-8 text-slate-500 mb-2" />
                 <span className="text-xs font-semibold text-slate-600">Select JSON Dataset</span>
                 <input
                   type="file"
@@ -275,19 +275,19 @@ export const ParserDashboard: React.FC = () => {
               <div className="space-y-4 text-xs">
                 <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
                   <div>
-                    <p className="font-semibold text-slate-400">Target Role</p>
+                    <p className="font-semibold text-slate-500">Target Role</p>
                     <p className="font-bold text-slate-800 mt-0.5">{jobData.role.title}</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-400">Role Category</p>
+                    <p className="font-semibold text-slate-500">Role Category</p>
                     <p className="font-bold text-slate-800 mt-0.5">{jobData.role.category}</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-400">Seniority</p>
+                    <p className="font-semibold text-slate-500">Seniority</p>
                     <p className="font-bold text-slate-800 mt-0.5">{jobData.role.seniority}</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-400">Industry Exposure</p>
+                    <p className="font-semibold text-slate-500">Industry Exposure</p>
                     <p className="font-bold text-slate-800 mt-0.5">{jobData.industry}</p>
                   </div>
                 </div>
@@ -331,11 +331,11 @@ export const ParserDashboard: React.FC = () => {
               <div className="space-y-3 text-xs">
                 <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
                   <div>
-                    <p className="font-semibold text-slate-400">Parsed Candidate Count</p>
+                    <p className="font-semibold text-slate-500">Parsed Candidate Count</p>
                     <p className="font-bold text-slate-800 mt-0.5">{candidatesCount}</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-400">Duplicate Candidate IDs</p>
+                    <p className="font-semibold text-slate-500">Duplicate Candidate IDs</p>
                     <p className="font-bold text-slate-800 mt-0.5">{validationReport.duplicate_ids.length}</p>
                   </div>
                 </div>
@@ -346,7 +346,7 @@ export const ParserDashboard: React.FC = () => {
                       <AlertTriangle className="h-3.5 w-3.5 mr-1" />
                       Ingestion Warnings ({validationReport.warnings.length})
                     </p>
-                    <ul className="list-disc pl-5 text-[10px] text-slate-500 max-h-32 overflow-y-auto space-y-0.5">
+                    <ul className="list-disc pl-5 text-[10px] text-slate-600 max-h-32 overflow-y-auto space-y-0.5">
                       {validationReport.warnings.map((w, i) => (
                         <li key={i}>{w.message}</li>
                       ))}

@@ -15,10 +15,10 @@ export const Dashboard: React.FC = () => {
       subtitle="Overview of Redrob Explainable Candidate Intelligence (RECI)"
       action={
         <div className="flex items-center space-x-2 bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-card">
-          <Activity className="h-4 w-4 text-slate-400" />
-          <span className="text-xs font-medium text-slate-500">System Link:</span>
+          <Activity className="h-4 w-4 text-slate-500" />
+          <span className="text-xs font-medium text-slate-600">System Link:</span>
           {isLoading ? (
-            <span className="inline-flex items-center text-xs font-semibold text-slate-400">
+            <span className="inline-flex items-center text-xs font-semibold text-slate-500">
               <Loader size="sm" />
             </span>
           ) : isError ? (
@@ -50,7 +50,7 @@ export const Dashboard: React.FC = () => {
         <Card hoverEffect={true}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Candidates</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Candidates</p>
               <h3 className="text-2xl font-bold text-slate-800 mt-2">1,248</h3>
             </div>
             <div className="h-10 w-10 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center text-primary">
@@ -66,7 +66,7 @@ export const Dashboard: React.FC = () => {
         <Card hoverEffect={true}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Parsed Resumes</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Parsed Resumes</p>
               <h3 className="text-2xl font-bold text-slate-800 mt-2">1,192</h3>
             </div>
             <div className="h-10 w-10 bg-emerald-50 border border-emerald-100 rounded-lg flex items-center justify-center text-success">
@@ -82,7 +82,7 @@ export const Dashboard: React.FC = () => {
         <Card hoverEffect={true}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Match Requests</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Match Requests</p>
               <h3 className="text-2xl font-bold text-slate-800 mt-2">432</h3>
             </div>
             <div className="h-10 w-10 bg-amber-50 border border-amber-100 rounded-lg flex items-center justify-center text-warning">
@@ -102,21 +102,21 @@ export const Dashboard: React.FC = () => {
         <div className="mt-4 space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
             <div className="p-3 bg-slate-50 border border-slate-100 rounded-lg">
-              <p className="font-semibold text-slate-400">Connection status</p>
+              <p className="font-semibold text-slate-500">Connection status</p>
               <p className={`font-bold mt-1 ${isError ? 'text-danger' : 'text-success'}`}>
                 {isLoading ? 'Checking...' : isError ? 'Disconnected' : 'Connected'}
               </p>
             </div>
             <div className="p-3 bg-slate-50 border border-slate-100 rounded-lg">
-              <p className="font-semibold text-slate-400">Service Name</p>
+              <p className="font-semibold text-slate-500">Service Name</p>
               <p className="font-bold mt-1 text-slate-800">{health?.service || 'N/A'}</p>
             </div>
             <div className="p-3 bg-slate-50 border border-slate-100 rounded-lg">
-              <p className="font-semibold text-slate-400">API version</p>
+              <p className="font-semibold text-slate-500">API version</p>
               <p className="font-bold mt-1 text-slate-800">{health?.version || 'N/A'}</p>
             </div>
             <div className="p-3 bg-slate-50 border border-slate-100 rounded-lg">
-              <p className="font-semibold text-slate-400">Environment</p>
+              <p className="font-semibold text-slate-500">Environment</p>
               <p className="font-bold mt-1 text-slate-800">Development</p>
             </div>
           </div>

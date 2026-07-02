@@ -1,0 +1,18 @@
+2026-07-02 10:44:21,426 | INFO | reci.app | session_created
+2026-07-02 10:44:21,456 | INFO | reci.app | session_created
+2026-07-02 10:44:21,477 | INFO | reci.app | upload_saved
+2026-07-02 10:44:21,587 | INFO | reci.app | candidates_processed
+2026-07-02 10:44:21,616 | INFO | reci.app | health_checked
+2026-07-02 10:44:21,637 | INFO | reci.app | session_created
+2026-07-02 10:44:21,694 | INFO | reci.app | session_created
+2026-07-02 10:44:21,695 | INFO | reci.app | demo_session_created
+2026-07-02 10:51:58,406 | INFO | reci.app | startup
+2026-07-02 10:51:58,408 | WARNING | reci.app | spaCy model missing; startup will attempt download
+2026-07-02 10:54:22,828 | INFO | reci.app | session_created
+2026-07-02 10:54:22,830 | INFO | reci.app | demo_session_created
+2026-07-02 10:59:05,108 | INFO | reci.app | session_created
+2026-07-02 10:59:05,111 | INFO | reci.app | demo_session_created
+2026-07-02 11:02:45,162 | INFO | reci.app | health_checked
+2026-07-02 11:02:56,297 | INFO | reci.app | session_created
+2026-07-02 11:02:56,299 | INFO | reci.app | demo_session_created
+2026-07-02 11:11:52,421 | INFO | reci.app | health_checked

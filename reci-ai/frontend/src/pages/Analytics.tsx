@@ -64,7 +64,7 @@ export const Analytics: React.FC = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[11px] text-slate-400 mt-4 text-center">
+          <p className="text-[11px] text-slate-500 mt-4 text-center">
             Represents the matching threshold density across the current candidate database.
           </p>
         </Card>
@@ -109,7 +109,7 @@ export const Analytics: React.FC = () => {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[11px] text-slate-400 mt-4 text-center">
+          <p className="text-[11px] text-slate-500 mt-4 text-center">
             Tracks total candidate resume extractions processed monthly.
           </p>
         </Card>

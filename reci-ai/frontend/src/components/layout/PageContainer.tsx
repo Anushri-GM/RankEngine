@@ -26,7 +26,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           <div>
             {title && <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">{title}</h1>}
-            {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+            {subtitle && <p className="mt-1 text-sm text-slate-600">{subtitle}</p>}
           </div>
           {action && <div className="flex items-center space-x-3">{action}</div>}
         </div>

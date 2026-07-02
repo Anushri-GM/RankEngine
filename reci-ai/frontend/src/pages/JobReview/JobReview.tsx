@@ -3,19 +3,20 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useJobUnderstanding, useUpdateJobUnderstanding, useConfirmJobUnderstanding } from '../../hooks/api/jobs';
 import { useSession } from '../../hooks/api/sessions';
-import { Card, Button, Spinner, SkillChip } from '../../components/common';
+import { Card, Button, Spinner } from '../../components/common';
+import { SkillChip } from '../../components/panels/ScorePanel';
 import { CheckCircle, Edit2 } from 'lucide-react';
 
 export const JobReviewPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
-  const { data: session } = useSession(sessionId);
+  useSession(sessionId);
   const { data: jobUnderstanding, isLoading: jobLoading } = useJobUnderstanding(sessionId);
   const updateJobMutation = useUpdateJobUnderstanding();
   const confirmJobMutation = useConfirmJobUnderstanding();
 
   const [isEditing, setIsEditing] = React.useState(false);
-  const [editedJob, setEditedJob] = React.useState(jobUnderstanding);
+  const [editedJob, setEditedJob] = React.useState(jobUnderstanding ?? undefined);
 
   React.useEffect(() => {
     if (jobUnderstanding) {
@@ -105,7 +106,7 @@ export const JobReviewPage: React.FC = () => {
                   value={editedJob?.role_title || ''}
                   onChange={(e) =>
                     setEditedJob(
-                      editedJob ? { ...editedJob, role_title: e.target.value } : null
+                      editedJob ? { ...editedJob, role_title: e.target.value } : undefined
                     )
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

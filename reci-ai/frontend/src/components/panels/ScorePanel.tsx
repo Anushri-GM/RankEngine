@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FitScoreBreakdown, FitComponent } from '../../types';
+import type { FitScoreBreakdown } from '../../types';
 import { formatScore } from '../../utils/formatters';
 import { ChevronDown } from 'lucide-react';
 

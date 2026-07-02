@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { RecruitingInsights, ExportOptions, ExportResult, ApiResponse } from '../../types';
+import type { RecruitingInsights, ExportOptions, ExportResult } from '../../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 

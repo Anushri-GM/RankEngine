@@ -60,11 +60,11 @@ interface BadgeProps {
 
 export const Badge: React.FC<BadgeProps> = ({ children, variant = 'primary', size = 'md', className = '' }) => {
   const variantClasses = {
-    primary: 'bg-blue-100 text-blue-800',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-yellow-100 text-yellow-800',
-    danger: 'bg-red-100 text-red-800',
-    info: 'bg-gray-100 text-gray-800',
+    primary: 'bg-primary-light text-primary-dark',
+    success: 'bg-success-light text-success-dark',
+    warning: 'bg-warning-light text-warning-dark',
+    danger: 'bg-danger-light text-danger-dark',
+    info: 'bg-slate-100 text-slate-700',
   };
 
   const sizeClasses = {
@@ -97,10 +97,10 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const variantClasses = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
-    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800',
-    danger: 'bg-red-600 hover:bg-red-700 text-white',
-    ghost: 'bg-transparent hover:bg-gray-100 text-gray-800',
+    primary: 'bg-primary text-white hover:bg-primary-dark',
+    secondary: 'bg-slate-100 text-slate-800 hover:bg-slate-200',
+    danger: 'bg-danger text-white hover:bg-danger-dark',
+    ghost: 'bg-transparent hover:bg-slate-50 text-slate-800',
   };
 
   const sizeClasses = {
@@ -130,7 +130,7 @@ interface CardProps {
 export const Card: React.FC<CardProps> = ({ children, className = '', hoverable = false }) => {
   return (
     <motion.div
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 ${hoverable ? 'hover:shadow-md transition-shadow cursor-pointer' : ''} ${className}`}
+      className={`bg-card rounded-xl ${hoverable ? 'hover:shadow-premium transition-shadow cursor-pointer' : 'shadow-card'} border border-gray-100 ${className}`}
       whileHover={hoverable ? { y: -2 } : {}}
     >
       {children}
@@ -149,9 +149,9 @@ interface EmptyStateProps {
 export const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, description, action, className = '' }) => {
   return (
     <div className={`text-center py-12 ${className}`}>
-      {icon && <div className="mb-4 flex justify-center text-gray-400 text-5xl">{icon}</div>}
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-      {description && <p className="text-gray-600 mb-6 max-w-sm mx-auto">{description}</p>}
+      {icon && <div className="mb-4 flex justify-center text-slate-500 text-5xl">{icon}</div>}
+      <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
+      {description && <p className="text-slate-600 mb-6 max-w-sm mx-auto">{description}</p>}
       {action && <div className="flex justify-center gap-2">{action}</div>}
     </div>
   );
@@ -231,11 +231,11 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, title, children, onClose, 
         className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl z-50 ${sizeClasses[size]} ${className}`}
       >
         {title && (
-          <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+          <div className="border-b border-slate-200 px-6 py-4 flex justify-between items-center">
+            <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+              className="text-slate-500 hover:text-slate-700 text-2xl leading-none"
             >
               ×
             </button>

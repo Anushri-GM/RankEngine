@@ -1,7 +1,15 @@
 import uvicorn
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from app.api.v1.endpoints.decision import router as decision_router
+from app.api.v1.endpoints.system import router as system_router
+from app.api.v1.endpoints.understanding import router as understanding_router
 from app.core.config import settings
+from app.core.exceptions import APIException, api_exception_handler, generic_exception_handler, http_exception_handler, validation_exception_handler
+from app.core.logging_config import app_logger
 
 # Initialize FastAPI application
 app = FastAPI(
@@ -12,73 +20,85 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()]
+if not origins:
+    origins = ["*"]
+
 # Enable CORS (Cross-Origin Resource Sharing)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, restrict to allowed origins
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Root endpoint
+# Register global exception handlers
+app.add_exception_handler(APIException, api_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(Exception, generic_exception_handler)
+
+
 @app.get("/", tags=["General"])
 async def root():
-    """
-    Root endpoint returning a welcome message.
-    """
+    """Root endpoint returning a welcome message."""
     return {
         "message": "Welcome to RECI (Redrob Explainable Candidate Intelligence) API Services.",
         "docs": "/docs",
-        "version": settings.VERSION
+        "version": settings.VERSION,
     }
 
-# Health check endpoint
+
 @app.get("/health", tags=["System"])
 async def health_check():
-    """
-    System health check endpoint.
-    """
+    """Legacy system health check endpoint."""
     return {
         "status": "healthy",
         "service": "RECI Backend",
-        "version": settings.VERSION
+        "version": settings.VERSION,
     }
+
 
 # Create api/v1 router
 api_router = APIRouter()
 
-# Re-register health check on api/v1 for ease of use in frontend
+
 @api_router.get("/health", tags=["System"])
 async def v1_health_check():
-    """
-    Version 1 health check endpoint.
-    """
+    """Version 1 health check endpoint."""
     return {
         "status": "healthy",
         "service": "RECI Backend",
-        "version": settings.VERSION
+        "version": settings.VERSION,
     }
 
+
 # Import understanding endpoints
-from app.api.v1.endpoints.understanding import router as understanding_router
 api_router.include_router(understanding_router, prefix="/understanding", tags=["Understanding"])
-from app.api.v1.endpoints.decision import router as decision_router
 api_router.include_router(decision_router, prefix="/decision", tags=["Decision"])
 
 # Register v1 router to the app
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(system_router, prefix=settings.API_V1_STR)
 
-# Automatically download spaCy model on startup if it doesn't exist
+
 @app.on_event("startup")
-def download_spacy_model():
-    import spacy
+def configure_runtime():
+    app_logger.info("startup", extra={"event": "startup", "environment": settings.ENV})
     try:
+        import spacy
+
         spacy.load("en_core_web_sm")
     except Exception:
-        print("spaCy model 'en_core_web_sm' not found. Downloading...")
-        import spacy.cli
-        spacy.cli.download("en_core_web_sm")
+        app_logger.warning("spaCy model missing; startup will attempt download", extra={"event": "startup_model_download"})
+        try:
+            import spacy.cli
+
+            spacy.cli.download("en_core_web_sm")
+        except Exception as exc:
+            app_logger.warning("spaCy model download failed", extra={"event": "startup_model_download_failed", "error": str(exc)})
+
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=settings.PORT, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=settings.PORT, reload=settings.ENV != "production")

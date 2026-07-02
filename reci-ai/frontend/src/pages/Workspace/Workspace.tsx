@@ -1,12 +1,12 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useCandidates, useSearchCandidates } from '../../hooks/api/candidates';
+import { useCandidates } from '../../hooks/api/candidates';
 import { useSession } from '../../hooks/api/sessions';
-import { Card, Button, Spinner, EmptyState, SkeletonLoader } from '../../components/common';
+import { Button, EmptyState, SkeletonLoader } from '../../components/common';
 import { CandidateCard } from '../../components/cards/CandidateCard';
-import { SearchFilters, CandidateProfile } from '../../types';
-import { Search, Filter, Download } from 'lucide-react';
+import type { SearchFilters } from '../../types';
+import { Search, Download } from 'lucide-react';
 
 export const WorkspacePage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -112,7 +112,7 @@ export const WorkspacePage: React.FC = () => {
           {/* Search and Filters */}
           <div className="flex gap-4 flex-col sm:flex-row">
             <div className="flex-1 relative">
-              <Search size={20} className="absolute left-3 top-3 text-gray-400" />
+              <Search size={20} className="absolute left-3 top-3 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search candidates..."

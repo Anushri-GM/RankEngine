@@ -2,11 +2,11 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCandidateDetail, useFitScoreBreakdown } from '../../hooks/api/candidates';
-import { Card, Button, Spinner, Badge, SkillChip } from '../../components/common';
+import { Card, Button, Spinner, Badge } from '../../components/common';
 import { FitScore, ScoreBreakdown, SkillChip as SkillChipComponent } from '../../components/panels/ScorePanel';
-import { EvidencePanel, DecisionTimeline } from '../../components/panels/EvidencePanel';
-import { formatScore, formatExperience } from '../../utils/formatters';
-import { ChevronLeft, Mail, Phone, MapPin, Award } from 'lucide-react';
+import { EvidencePanel } from '../../components/panels/EvidencePanel';
+import { formatScore } from '../../utils/formatters';
+import { ChevronLeft, Mail, Phone, MapPin } from 'lucide-react';
 
 export const CandidateDetailPage: React.FC = () => {
   const { sessionId, candidateId } = useParams<{ sessionId: string; candidateId: string }>();
@@ -239,7 +239,7 @@ export const CandidateDetailPage: React.FC = () => {
               {candidate.evidence ? (
                 <EvidencePanel evidence={candidate.evidence} />
               ) : (
-                <Card className="p-12 text-center text-gray-500">
+                <Card className="p-12 text-center text-slate-500">
                   <p>No evidence data available</p>
                 </Card>
               )}

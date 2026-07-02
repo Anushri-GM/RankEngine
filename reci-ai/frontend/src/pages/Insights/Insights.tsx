@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { useInsights, useExportResults } from '../../hooks/api/insights';
 import { useSession } from '../../hooks/api/sessions';
 import { Card, Button, Spinner, Badge, EmptyState } from '../../components/common';
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { Download, FileJson, FileText } from 'lucide-react';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Download } from 'lucide-react';
 
 const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
 
@@ -160,7 +160,7 @@ export const InsightsPage: React.FC = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name} ${(Math.round((percent ?? 0) * 100))}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"

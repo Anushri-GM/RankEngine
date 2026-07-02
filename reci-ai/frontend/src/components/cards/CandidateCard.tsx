@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CandidateProfile } from '../../types';
+import type { CandidateProfile } from '../../types';
 import { Card, Badge } from '../common';
-import { formatScore, getScoreColor, getRecommendationColor, getRecommendationLabel } from '../../utils/formatters';
+import { formatScore, getScoreColor, getRecommendationLabel } from '../../utils/formatters';
 import { ChevronRight, Award } from 'lucide-react';
 
 interface CandidateCardProps {
@@ -37,20 +37,20 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
 
         {/* Header */}
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">{candidate.name}</h3>
-          <p className="text-sm text-gray-600">{candidate.location}</p>
+          <h3 className="text-lg font-semibold text-slate-900 mb-1">{candidate.name}</h3>
+          <p className="text-sm text-slate-600">{candidate.location}</p>
         </div>
 
         {/* Score Summary */}
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <p className="text-xs text-gray-600 font-medium mb-1">Overall Fit</p>
+            <p className="text-xs text-slate-600 font-medium mb-1">Overall Fit</p>
             <p className={`text-2xl font-bold ${getScoreColor(candidate.overall_fit_score)}`}>
               {formatScore(candidate.overall_fit_score)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-600 font-medium mb-1">Trust Score</p>
+            <p className="text-xs text-slate-600 font-medium mb-1">Trust Score</p>
             <p className={`text-2xl font-bold ${getScoreColor(candidate.recruiter_trust_score)}`}>
               {formatScore(candidate.recruiter_trust_score)}
             </p>
@@ -60,16 +60,16 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
         {/* Fit Components */}
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">Technical</p>
-            <p className="text-sm font-semibold text-gray-900">{formatScore(candidate.technical_fit)}</p>
+            <p className="text-xs text-slate-500 mb-1">Technical</p>
+            <p className="text-sm font-semibold text-slate-900">{formatScore(candidate.technical_fit)}</p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">Career</p>
-            <p className="text-sm font-semibold text-gray-900">{formatScore(candidate.career_fit)}</p>
+            <p className="text-xs text-slate-500 mb-1">Career</p>
+            <p className="text-sm font-semibold text-slate-900">{formatScore(candidate.career_fit)}</p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">Behavior</p>
-            <p className="text-sm font-semibold text-gray-900">{formatScore(candidate.behavior_fit)}</p>
+            <p className="text-xs text-slate-500 mb-1">Behavior</p>
+            <p className="text-sm font-semibold text-slate-900">{formatScore(candidate.behavior_fit)}</p>
           </div>
         </div>
 
@@ -104,7 +104,7 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
           {onCompare && (
             <button
               onClick={onCompare}
-              className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg font-medium transition-colors"
             >
               Compare
             </button>

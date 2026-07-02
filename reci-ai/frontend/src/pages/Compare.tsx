@@ -21,7 +21,7 @@ export const Compare: React.FC = () => {
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-800">Sarah Jenkins</h3>
-              <p className="text-xs text-slate-400">Senior Full Stack Engineer • 7 years exp</p>
+              <p className="text-xs text-slate-500">Senior Full Stack Engineer • 7 years exp</p>
               <div className="mt-2">
                 <StatusBadge status="success" label="Match Score 94%" />
               </div>
@@ -61,7 +61,7 @@ export const Compare: React.FC = () => {
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-800">David Kojo</h3>
-              <p className="text-xs text-slate-400">AI Infrastructure Architect • 9 years exp</p>
+              <p className="text-xs text-slate-500">AI Infrastructure Architect • 9 years exp</p>
               <div className="mt-2">
                 <StatusBadge status="success" label="Match Score 88%" />
               </div>
@@ -96,11 +96,11 @@ export const Compare: React.FC = () => {
       {/* Comparison table */}
       <Card className="mt-8">
         <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4 flex items-center">
-          <Users className="h-4 w-4 mr-2 text-slate-400" />
+          <Users className="h-4 w-4 mr-2 text-slate-500" />
           Technical Fit Vectors
         </h3>
         <div className="space-y-4 text-xs">
-          <div className="grid grid-cols-3 font-semibold text-slate-400 border-b border-slate-50 pb-2">
+          <div className="grid grid-cols-3 font-semibold text-slate-500 border-b border-slate-50 pb-2">
             <div>Vector Dimension</div>
             <div>Sarah Jenkins</div>
             <div>David Kojo</div>
