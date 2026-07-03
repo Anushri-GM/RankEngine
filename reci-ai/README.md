@@ -26,12 +26,27 @@ reci-ai/
 └── Dockerfile            # Container build definition
 ```
 
-## Local Development
-```bash
-python -m pip install -r requirements.txt
-npm install --prefix frontend
-python -m pytest backend/tests -q
-```
+## Local Development (easiest way to run)
+We have provided easy-to-use startup scripts at the root of the repository to automate dependency checks, `.env` file generation, and running both frontend and backend in parallel.
+
+### Prerequisites
+* **Python**: `3.10` or higher (with `pip` added to system PATH)
+* **Node.js**: `18.0` or higher (with `npm` added to system PATH)
+
+### Running the App
+* **Windows**: Double-click `run_local.bat` (or run it from CMD/PowerShell in the repository root).
+* **macOS / Linux**: Open a terminal in the repository root and run:
+  ```bash
+  chmod +x run_local.sh
+  ./run_local.sh
+  ```
+
+### Accessing the Application
+Once the startup script completes:
+* **Frontend UI**: [http://localhost:5173](http://localhost:5173)
+* **Backend API Docs (Swagger)**: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+
 
 ## Deployment
 - Backend: Render with `uvicorn app.main:app --host 0.0.0.0 --port $PORT`

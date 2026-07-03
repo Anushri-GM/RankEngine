@@ -169,3 +169,16 @@
 2026-07-02 21:33:37,392 | INFO | reci.app | demo_data_already_present
 2026-07-02 21:34:05,670 | INFO | reci.app | startup
 2026-07-02 21:34:06,538 | INFO | reci.app | demo_data_already_present
+2026-07-02 21:34:18,027 | INFO | reci.app | startup
+2026-07-02 21:34:18,851 | INFO | reci.app | demo_data_already_present
+2026-07-02 21:36:14,533 | INFO | reci.app | session_created
+2026-07-02 21:36:14,539 | INFO | reci.app | demo_session_created
+2026-07-02 21:39:08,294 | INFO | reci.app | session_created
+2026-07-02 21:39:08,299 | INFO | reci.app | session_created_with_title
+2026-07-02 21:42:06,799 | INFO | reci.app | session_created
+2026-07-02 21:42:06,804 | INFO | reci.app | demo_session_created
+2026-07-02 21:44:14,831 | INFO | reci.app | health_checked
+2026-07-02 21:50:33,027 | INFO | reci.app | session_created
+2026-07-02 21:50:33,033 | INFO | reci.app | session_created_with_title
+2026-07-02 21:51:03,036 | INFO | reci.app | session_created
+2026-07-02 21:51:03,039 | INFO | reci.app | demo_session_created
